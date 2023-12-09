@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wildlife Genesis</title>
+    <link rel="stylesheet" href="./styles/app.css">
+</head>
+<body>
+    <div class="ligne">
+        <div class="colonne">
+            <div class="ligne">
+                <fieldset class="colonne">
+                    <legend>Animal</legend>
+                    <div class="ligne">
+                        <label for="txtNameAnimal">Name:</label>
+                        <input type="text" id="txtNameAnimal" />
+                    </div>
+                    <div class="ligne">
+                        <label for="txtTypeAnimal">Type:</label>
+                        <input type="text" id="txtTypeAnimal" />
+                    </div>
+                    <div class="ligne">
+                        <button id="btnAddAnimal">➕ Animal</button>
+                    </div>
+                </fieldset>
+                <fieldset class="colonne">
+                    <legend>Plant</legend>
+                    <div class="ligne">
+                        <label for="txtNamePlant">Name:</label>
+                        <input type="text" id="txtNamePlant" />
+                    </div>
+                    <div class="ligne">
+                        <label for="txtTypePlant">Type:</label>
+                        <input type="text" id="txtTypePlant" />
+                    </div>
+                    <div class="ligne">
+                        <button id="btnAddPlant">➕ Plant</button>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div class="colonne">
+            <div class="ligne">
+                <div class="colonne" id="content">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./dist/bundle.js"></script>
+</body>
+</html>

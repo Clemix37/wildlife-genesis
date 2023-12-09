@@ -1,0 +1,19 @@
+@import url("./FlexIt.css");
+:root {
+    --green-txt: green;
+    --red-txt: red;
+}
+
+body,* {
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+}
+
+.good-event {
+    color:var(--green-txt);
+}
+
+.bad-event {
+    color: var(--red-txt);
+}
