@@ -3,5 +3,6 @@ export default interface ILife {
     name:string; // Name of life
     actions:string[]; // List of actions of the life
     alive:boolean;
+    icon:string; // Icon for the display of instance
     live: Function; // Function called
 }

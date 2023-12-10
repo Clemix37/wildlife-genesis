@@ -1,11 +1,5 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
-var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
-    if (kind === "m") throw new TypeError("Private method is not writable");
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
-};
 var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
     if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
@@ -14,32 +8,33 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _Animal_instances, _Animal_functions, _Animal_getDisplayTemplate, _Animal_getTmplEating, _Animal_getRandomAction;
+var _Animal_instances, _Animal_getTmplEating, _Animal_getRandomAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 const Content_1 = __importDefault(require("./Content"));
 const Life_1 = __importDefault(require("./Life"));
+const Plant_1 = __importDefault(require("./Plant"));
 const Utils_1 = __importDefault(require("./Utils"));
 class Animal extends Life_1.default {
     //#endregion
     //#region Constructor
     constructor({ name, race }) {
         const actions = ["eat", "kill", "reproduce"];
-        super(name, actions);
+        super({ name, actions, icon: "🐶" });
         _Animal_instances.add(this);
-        _Animal_functions.set(this, void 0);
-        __classPrivateFieldSet(this, _Animal_functions, {
-            "eat": this.eat,
-            "kill": this.kill,
-            "reproduce": this.reproduce,
-        }, "f");
         this.race = race;
     }
     //#endregion
     //#region Public methods
-    live(possiblePlantToEat) {
-        var _a, _b;
+    live(population) {
+        const plants = population.filter(theLife => theLife instanceof Plant_1.default && theLife.eatable);
+        const possiblePlantToEat = plants.length > 0 ? plants[Utils_1.default.getRandomIndex(plants)] : null;
         const fctName = __classPrivateFieldGet(this, _Animal_instances, "m", _Animal_getRandomAction).call(this);
-        (_b = (_a = __classPrivateFieldGet(this, _Animal_functions, "f"))[fctName]) === null || _b === void 0 ? void 0 : _b.call(_a, possiblePlantToEat);
+        if (fctName === "eat")
+            this.eat(possiblePlantToEat);
+        else if (fctName === "kill")
+            this.kill();
+        else if (fctName === "reproduce")
+            this.reproduce();
     }
     eat(lifeToEat) {
         const display = __classPrivateFieldGet(this, _Animal_instances, "m", _Animal_getTmplEating).call(this, lifeToEat);
@@ -48,31 +43,30 @@ class Animal extends Life_1.default {
         Content_1.default.display(display);
     }
     kill() {
+        Utils_1.default.itemHasBeenKilled = true;
+        this.alive = false;
+        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "space-around"));
     }
     reproduce() {
+        Utils_1.default.itemHasReproduced = true;
+        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="good-event"> - Reproducing - </span><span>${this.name}</span>`, true, "space-around"));
     }
 }
-_Animal_functions = new WeakMap(), _Animal_instances = new WeakSet(), _Animal_getDisplayTemplate = function _Animal_getDisplayTemplate(content) {
-    return `
-            <div class="ligne">
-                ${content}
-            </div>
-        `;
-}, _Animal_getTmplEating = function _Animal_getTmplEating(lifeToEat) {
+_Animal_instances = new WeakSet(), _Animal_getTmplEating = function _Animal_getTmplEating(lifeToEat) {
     const display = !!lifeToEat ? `
-            <span class="good-event">✅ - Eating - </span>
+            <span class="good-event"> - Eating - </span>
             <span>${this.name} => ${lifeToEat.name}</span>
         ` : `
-            <span class="bad-event">❌ - Error - </span>
+            <span class="bad-event"> - Error - </span>
             <span>No plant to eat</span>
         `;
-    return __classPrivateFieldGet(this, _Animal_instances, "m", _Animal_getDisplayTemplate).call(this, display);
+    return Utils_1.default.getDisplayTemplate(display, true, "space-around");
 }, _Animal_getRandomAction = function _Animal_getRandomAction() {
     return this.actions[Utils_1.default.getRandomIndex(this.actions)];
 };
 exports.default = Animal;
 
-},{"./Content":2,"./Life":4,"./Utils":6}],2:[function(require,module,exports){
+},{"./Content":2,"./Life":4,"./Plant":5,"./Utils":6}],2:[function(require,module,exports){
 "use strict";
 var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
     if (kind === "m") throw new TypeError("Private method is not writable");
@@ -85,7 +79,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Content_id, _Content_element;
+var _Content_id, _Content_idPopulation, _Content_element, _Content_populationElement;
 Object.defineProperty(exports, "__esModule", { value: true });
 class Content {
     //#endregion
@@ -93,17 +87,24 @@ class Content {
     constructor() {
         //#region properties
         _Content_id.set(this, void 0);
+        _Content_idPopulation.set(this, void 0);
         _Content_element.set(this, void 0);
+        _Content_populationElement.set(this, void 0);
         __classPrivateFieldSet(this, _Content_id, "content", "f");
+        __classPrivateFieldSet(this, _Content_idPopulation, "population", "f");
         __classPrivateFieldSet(this, _Content_element, document.getElementById(__classPrivateFieldGet(this, _Content_id, "f")), "f");
+        __classPrivateFieldSet(this, _Content_populationElement, document.getElementById(__classPrivateFieldGet(this, _Content_idPopulation, "f")), "f");
     }
     //#endregion
     //#region Public methods
     display(dom) {
         __classPrivateFieldGet(this, _Content_element, "f").innerHTML += dom;
     }
+    displayPopulation(dom) {
+        __classPrivateFieldGet(this, _Content_populationElement, "f").innerHTML = dom;
+    }
 }
-_Content_id = new WeakMap(), _Content_element = new WeakMap();
+_Content_id = new WeakMap(), _Content_idPopulation = new WeakMap(), _Content_element = new WeakMap(), _Content_populationElement = new WeakMap();
 exports.default = new Content();
 
 },{}],3:[function(require,module,exports){
@@ -116,17 +117,19 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _Ecosystem_instances, _Ecosystem_getNextLife;
+var _Ecosystem_instances, _Ecosystem_checkForActionsAfterSimulation, _Ecosystem_getNextLife, _Ecosystem_actionAfterKill, _Ecosystem_actionAfterReproduce, _Ecosystem_displayPopulationAndDeads;
 Object.defineProperty(exports, "__esModule", { value: true });
 const Animal_1 = __importDefault(require("./Animal"));
+const Content_1 = __importDefault(require("./Content"));
 const Plant_1 = __importDefault(require("./Plant"));
 const Utils_1 = __importDefault(require("./Utils"));
 class Ecosystem {
     //#endregion
     //#region Constructor
-    constructor({ population }) {
+    constructor({ population, deads }) {
         _Ecosystem_instances.add(this);
         this.population = population;
+        this.deads = deads;
         this.indexLife = -1;
     }
     //#endregion
@@ -135,41 +138,72 @@ class Ecosystem {
         this.population.push(...lives);
     }
     simulate() {
+        __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_displayPopulationAndDeads).call(this);
         setInterval(() => {
             const nextLife = __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_getNextLife).call(this);
             if (nextLife instanceof Animal_1.default) {
-                // Only the eatable Plant
-                const plants = this.population.filter(life => life instanceof Plant_1.default && life.eatable);
-                const plantToEat = plants.length > 0 ? plants[Utils_1.default.getRandomIndex(plants)] : null;
-                nextLife.live(plantToEat);
-                // We remove the Plant from the population if the plant is still alive
-                if (!!(plantToEat === null || plantToEat === void 0 ? void 0 : plantToEat.alive))
-                    this.population = this.population.filter(lifeElement => lifeElement.id !== plantToEat.id);
+                nextLife.live(this.population);
+                this.deads = [...this.deads, ...this.population.filter(theLife => !theLife.alive)];
+                this.population = this.population.filter(theLife => theLife.alive);
             }
-            else if (nextLife instanceof Plant_1.default) {
-                nextLife.grow();
-            }
-        }, 2000);
+            else if (nextLife instanceof Plant_1.default)
+                nextLife.live();
+            __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_checkForActionsAfterSimulation).call(this, nextLife);
+            __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_displayPopulationAndDeads).call(this);
+        }, Utils_1.default.delayBetweenActions);
     }
 }
-_Ecosystem_instances = new WeakSet(), _Ecosystem_getNextLife = function _Ecosystem_getNextLife() {
+_Ecosystem_instances = new WeakSet(), _Ecosystem_checkForActionsAfterSimulation = function _Ecosystem_checkForActionsAfterSimulation(actualLife) {
+    if (Utils_1.default.itemHasBeenKilled)
+        __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_actionAfterKill).call(this, actualLife);
+    else if (Utils_1.default.itemHasReproduced)
+        __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_actionAfterReproduce).call(this, actualLife);
+}, _Ecosystem_getNextLife = function _Ecosystem_getNextLife() {
     this.indexLife = this.indexLife >= this.population.length - 1 ? 0 : this.indexLife + 1;
     return this.population[this.indexLife];
+}, _Ecosystem_actionAfterKill = function _Ecosystem_actionAfterKill(actualLife) {
+    Utils_1.default.itemHasBeenKilled = false;
+    // We add the new dead
+    this.deads.push(actualLife);
+    // We remove the killed one from population
+    this.population = this.population.filter(aLife => aLife.id !== actualLife.id);
+}, _Ecosystem_actionAfterReproduce = function _Ecosystem_actionAfterReproduce(actualLife) {
+    Utils_1.default.itemHasReproduced = false;
+    // Create the animal
+    if (actualLife instanceof Animal_1.default) {
+        const newAnimal = new Animal_1.default({ name: `${actualLife.name} Jr`, race: actualLife.race });
+        this.addLives(newAnimal);
+    }
+    // Create the plant
+    else if (actualLife instanceof Plant_1.default) {
+        const newPlant = new Plant_1.default({ name: actualLife.name, eatable: actualLife.eatable });
+        this.addLives(newPlant);
+    }
+}, _Ecosystem_displayPopulationAndDeads = function _Ecosystem_displayPopulationAndDeads() {
+    let display = "";
+    const everyone = [...this.population, ...this.deads];
+    for (let i = 0; i < everyone.length; i++) {
+        const theLife = everyone[i];
+        display += Utils_1.default.getDisplayTemplate(theLife.alive ? `<span class="good-event">❤️ - ${theLife.icon} - ${theLife.name}</span>`
+            : `<span class="bad-event">💀 - ${theLife.icon} - ${theLife.name}</span>`, true, "space-around");
+    }
+    Content_1.default.displayPopulation(Utils_1.default.getDisplayTemplate(display, false));
 };
 exports.default = Ecosystem;
 
-},{"./Animal":1,"./Plant":5,"./Utils":6}],4:[function(require,module,exports){
+},{"./Animal":1,"./Content":2,"./Plant":5,"./Utils":6}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const uuid_1 = require("uuid");
 class Life {
     //#endregion
     //#region Constructor
-    constructor(name, actions) {
+    constructor({ name, actions, icon }) {
         this.id = (0, uuid_1.v4)();
         this.name = name;
         this.actions = actions;
         this.alive = true;
+        this.icon = icon;
     }
     //#endregion
     //#region Public methods
@@ -179,12 +213,6 @@ exports.default = Life;
 
 },{"uuid":8}],5:[function(require,module,exports){
 "use strict";
-var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
-    if (kind === "m") throw new TypeError("Private method is not writable");
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
-};
 var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
     if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
@@ -193,7 +221,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _Plant_instances, _Plant_functions, _Plant_getDisplayTemplate, _Plant_getRandomAction;
+var _Plant_instances, _Plant_getDisplayTemplate, _Plant_getRandomAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 const Content_1 = __importDefault(require("./Content"));
 const Life_1 = __importDefault(require("./Life"));
@@ -203,32 +231,26 @@ class Plant extends Life_1.default {
     //#region Constructor
     constructor({ name, eatable = true }) {
         const actions = ["grow"];
-        super(name, actions);
+        super({ name, actions, icon: "🪴" });
         _Plant_instances.add(this);
-        _Plant_functions.set(this, void 0);
-        __classPrivateFieldSet(this, _Plant_functions, {
-            "grow": this.grow,
-        }, "f");
         this.eatable = eatable;
     }
     //#endregion
     //#region Public methods
     live() {
-        var _a, _b;
         const fctName = __classPrivateFieldGet(this, _Plant_instances, "m", _Plant_getRandomAction).call(this);
-        (_b = (_a = __classPrivateFieldGet(this, _Plant_functions, "f"))[fctName]) === null || _b === void 0 ? void 0 : _b.call(_a);
+        if (fctName === "grow")
+            this.grow();
     }
     grow() {
         Content_1.default.display(__classPrivateFieldGet(this, _Plant_instances, "m", _Plant_getDisplayTemplate).call(this));
     }
 }
-_Plant_functions = new WeakMap(), _Plant_instances = new WeakSet(), _Plant_getDisplayTemplate = function _Plant_getDisplayTemplate() {
-    return `
-            <div class="ligne">
-                <span class="good-event">✅ - Growing - </span>
-                <span>${this.name}</span>
-            </div>
-        `;
+_Plant_instances = new WeakSet(), _Plant_getDisplayTemplate = function _Plant_getDisplayTemplate() {
+    return Utils_1.default.getDisplayTemplate(`
+            <span class="good-event"> - Growing - </span>
+            <span>${this.name}</span>
+        `, true, "space-around");
 }, _Plant_getRandomAction = function _Plant_getRandomAction() {
     return this.actions[Utils_1.default.getRandomIndex(this.actions)];
 };
@@ -238,15 +260,26 @@ exports.default = Plant;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Utils {
-    //#region Properties
     //#endregion
     //#region Constructor
     constructor() {
+        this.itemHasReproduced = false;
+        this.itemHasToBeDelete = false;
+        this.itemHasBeenKilled = false;
+        this.delayBetweenActions = 2000;
     }
     //#endregion
     //#region Public methods
     getRandomIndex(tab) {
         return Math.floor(Math.random() * tab.length);
+    }
+    getDisplayTemplate(content, isLine = true, additionnalClasses = "") {
+        const classes = `${isLine ? "ligne" : "colonne"} ${additionnalClasses}`;
+        return `
+            <div class="${classes}">
+                ${content}
+            </div>
+        `;
     }
 }
 exports.default = new Utils();
@@ -267,37 +300,34 @@ const BTNS = {
         PLANT: document.getElementById("btnAddPlant"),
     },
 };
-const ecosystem = new Ecosystem_1.default({ population: [] });
+const ecosystem = new Ecosystem_1.default({ population: [], deads: [] });
 //#region Events
 function bindPageEvents() {
     // Add the animal
     BTNS.ADD.ANIMAL.addEventListener("click", () => {
-        const a = new Animal_1.default({ name: "Chien", race: "Labrador" });
+        const a = new Animal_1.default({ name: "Dog", race: "Labrador" });
         ecosystem.addLives(a);
     });
     // Add the plant
     BTNS.ADD.PLANT.addEventListener("click", () => {
-        const p = new Plant_1.default({ name: "Fleur" });
+        const p = new Plant_1.default({ name: "Flower" });
         ecosystem.addLives(p);
     });
 }
 //#endregion
 bindPageEvents();
 // @todo delete
-const p1 = new Plant_1.default({ name: "Fleur" });
+const p1 = new Plant_1.default({ name: "Flower" });
 const p2 = new Plant_1.default({ name: "Arbre", eatable: false });
 const p3 = new Plant_1.default({ name: "Trefle" });
-const p4 = new Plant_1.default({ name: "Fleur" });
-const a1 = new Animal_1.default({ name: "Chien", race: "Labrador" });
+const p4 = new Plant_1.default({ name: "Flower" });
+const a1 = new Animal_1.default({ name: "Dog", race: "Labrador" });
 const a2 = new Animal_1.default({ name: "Cerf", race: "Jsp" });
 const a3 = new Animal_1.default({ name: "Racoon", race: "Marron" });
-const a4 = new Animal_1.default({ name: "Chat", race: "Ragdoll" });
+const a4 = new Animal_1.default({ name: "Cat", race: "Ragdoll" });
 ecosystem.addLives(p1, p2, p3, p4, a1, a2, a3, a4);
 // Every XX seconds we simulate the ecosystem
 ecosystem.simulate(); // We launch first simulation
-// setInterval(() => {
-//     ecosystem.simulate();
-// }, DELAY_BETWEEN_SIMULATIONS);
 
 },{"./classes/Animal":1,"./classes/Ecosystem":3,"./classes/Plant":5}],8:[function(require,module,exports){
 "use strict";

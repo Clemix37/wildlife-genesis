@@ -8,7 +8,6 @@ export default class Plant extends Life implements IPlant {
     //#region Properties
 
     eatable:boolean;
-    #functions:{[K:string]:Function};
 
     //#endregion
 
@@ -16,10 +15,7 @@ export default class Plant extends Life implements IPlant {
 
     constructor({name,eatable=true}:{name:string,eatable?:boolean}){
         const actions = ["grow"];
-        super(name, actions);
-        this.#functions = {
-            "grow": this.grow,
-        };
+        super({name, actions, icon: "🪴"});
         this.eatable = eatable;
     }
 
@@ -29,7 +25,7 @@ export default class Plant extends Life implements IPlant {
 
     live():void{
         const fctName = this.#getRandomAction();
-        this.#functions[fctName]?.();
+        if(fctName === "grow") this.grow();
     }
 
     grow():void{
@@ -41,12 +37,10 @@ export default class Plant extends Life implements IPlant {
     //#region Private methods
 
     #getDisplayTemplate():string{
-        return `
-            <div class="ligne">
-                <span class="good-event">✅ - Growing - </span>
-                <span>${this.name}</span>
-            </div>
-        `;
+        return Utils.getDisplayTemplate(`
+            <span class="good-event"> - Growing - </span>
+            <span>${this.name}</span>
+        `, true, "space-around");
     }
 
     #getRandomAction():string{

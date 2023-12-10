@@ -8,17 +8,19 @@ export default class Life implements ILife {
     id:string;
     name:string;
     alive:boolean;
+    icon: string;
     actions:string[];
 
     //#endregion
     
     //#region Constructor
     
-    constructor(name:string,actions:string[]){
+    constructor({name,actions,icon}:{name:string,actions:string[],icon:string}){
         this.id = uuidv4();
         this.name = name;
         this.actions = actions;
         this.alive = true;
+        this.icon = icon;
     }
 
     //#endregion

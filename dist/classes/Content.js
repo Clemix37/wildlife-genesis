@@ -10,7 +10,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Content_id, _Content_element;
+var _Content_id, _Content_idPopulation, _Content_element, _Content_populationElement;
 Object.defineProperty(exports, "__esModule", { value: true });
 class Content {
     //#endregion
@@ -18,15 +18,22 @@ class Content {
     constructor() {
         //#region properties
         _Content_id.set(this, void 0);
+        _Content_idPopulation.set(this, void 0);
         _Content_element.set(this, void 0);
+        _Content_populationElement.set(this, void 0);
         __classPrivateFieldSet(this, _Content_id, "content", "f");
+        __classPrivateFieldSet(this, _Content_idPopulation, "population", "f");
         __classPrivateFieldSet(this, _Content_element, document.getElementById(__classPrivateFieldGet(this, _Content_id, "f")), "f");
+        __classPrivateFieldSet(this, _Content_populationElement, document.getElementById(__classPrivateFieldGet(this, _Content_idPopulation, "f")), "f");
     }
     //#endregion
     //#region Public methods
     display(dom) {
         __classPrivateFieldGet(this, _Content_element, "f").innerHTML += dom;
     }
+    displayPopulation(dom) {
+        __classPrivateFieldGet(this, _Content_populationElement, "f").innerHTML = dom;
+    }
 }
-_Content_id = new WeakMap(), _Content_element = new WeakMap();
+_Content_id = new WeakMap(), _Content_idPopulation = new WeakMap(), _Content_element = new WeakMap(), _Content_populationElement = new WeakMap();
 exports.default = new Content();
