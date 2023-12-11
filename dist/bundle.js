@@ -26,17 +26,17 @@ class Animal extends Life_1.default {
     //#endregion
     //#region Public methods
     live(population) {
-        const plants = population.filter(theLife => theLife instanceof Plant_1.default && theLife.eatable);
-        const possiblePlantToEat = plants.length > 0 ? plants[Utils_1.default.getRandomIndex(plants)] : null;
         const fctName = __classPrivateFieldGet(this, _Animal_instances, "m", _Animal_getRandomAction).call(this);
         if (fctName === "eat")
-            this.eat(possiblePlantToEat);
+            this.eat(population);
         else if (fctName === "kill")
             this.kill();
         else if (fctName === "reproduce")
-            this.reproduce();
+            this.reproduce(population);
     }
-    eat(lifeToEat) {
+    eat(population) {
+        const plants = population.filter(theLife => theLife instanceof Plant_1.default && theLife.eatable);
+        const lifeToEat = plants.length > 0 ? plants[Utils_1.default.getRandomIndex(plants)] : null;
         const display = __classPrivateFieldGet(this, _Animal_instances, "m", _Animal_getTmplEating).call(this, lifeToEat);
         if (!!lifeToEat)
             lifeToEat.alive = false;
@@ -47,7 +47,11 @@ class Animal extends Life_1.default {
         this.alive = false;
         Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "space-around"));
     }
-    reproduce() {
+    reproduce(population) {
+        const animals = population.filter(theLife => theLife instanceof Animal && theLife.id !== this.id);
+        const animalToReproduceWith = animals.length > 0 ? animals[Utils_1.default.getRandomIndex(animals)] : null;
+        if (!animalToReproduceWith)
+            return Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Error - </span><span>No reproduction without other animal (${this.name})</span>`, true, "space-around"));
         Utils_1.default.itemHasReproduced = true;
         Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="good-event"> - Reproducing - </span><span>${this.name}</span>`, true, "space-around"));
     }
@@ -143,7 +147,8 @@ class Ecosystem {
             const nextLife = __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_getNextLife).call(this);
             if (nextLife instanceof Animal_1.default) {
                 nextLife.live(this.population);
-                this.deads = [...this.deads, ...this.population.filter(theLife => !theLife.alive)];
+                const idsOfDeads = [...this.deads.map(dead => dead.id)];
+                this.deads = [...this.deads, ...this.population.filter(theLife => !theLife.alive && !idsOfDeads.includes(theLife.id))];
                 this.population = this.population.filter(theLife => theLife.alive);
             }
             else if (nextLife instanceof Plant_1.default)
@@ -163,8 +168,10 @@ _Ecosystem_instances = new WeakSet(), _Ecosystem_checkForActionsAfterSimulation 
     return this.population[this.indexLife];
 }, _Ecosystem_actionAfterKill = function _Ecosystem_actionAfterKill(actualLife) {
     Utils_1.default.itemHasBeenKilled = false;
-    // We add the new dead
-    this.deads.push(actualLife);
+    const idsOfDeads = [...this.deads.map(dead => dead.id)];
+    // We add the new dead if not already in here
+    if (!idsOfDeads.includes(actualLife.id))
+        this.deads.push(actualLife);
     // We remove the killed one from population
     this.population = this.population.filter(aLife => aLife.id !== actualLife.id);
 }, _Ecosystem_actionAfterReproduce = function _Ecosystem_actionAfterReproduce(actualLife) {

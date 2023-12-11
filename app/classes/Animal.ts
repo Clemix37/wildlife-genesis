@@ -25,27 +25,31 @@ export default class Animal extends Life implements IAnimal {
     //#region Public methods
 
     live(population:Life[]):void{
-        const plants:Plant[] = population.filter(theLife => theLife instanceof Plant && theLife.eatable) as Plant[];
-        const possiblePlantToEat:(Plant|null) = plants.length > 0 ? plants[Utils.getRandomIndex(plants)] : null;
         const fctName:string = this.#getRandomAction();
-        if(fctName === "eat") this.eat(possiblePlantToEat);
+        if(fctName === "eat") this.eat(population);
         else if(fctName === "kill") this.kill();
-        else if(fctName === "reproduce") this.reproduce();
+        else if(fctName === "reproduce") this.reproduce(population);
     }
 
-    eat(lifeToEat:(Plant|null)):void{
+    eat(population:Life[]):void{
+        const plants:Plant[] = population.filter(theLife => theLife instanceof Plant && theLife.eatable) as Plant[];
+        const lifeToEat:(Plant|null) = plants.length > 0 ? plants[Utils.getRandomIndex(plants)] : null;
         const display = this.#getTmplEating(lifeToEat);
         if(!!lifeToEat) lifeToEat.alive = false;
         Content.display(display);
     }
 
-    kill(){
+    kill():void{
         Utils.itemHasBeenKilled = true;
         this.alive = false;
         Content.display(Utils.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "space-around"));
     }
 
-    reproduce(){
+    reproduce(population:Life[]):void{
+        const animals:Animal[] = population.filter(theLife => theLife instanceof Animal && theLife.id !== this.id) as Animal[];
+        const animalToReproduceWith = animals.length > 0 ? animals[Utils.getRandomIndex(animals)] : null;
+        if(!animalToReproduceWith) 
+            return Content.display(Utils.getDisplayTemplate(`<span class="bad-event"> - Error - </span><span>No reproduction without other animal (${this.name})</span>`, true, "space-around"));
         Utils.itemHasReproduced = true;
         Content.display(Utils.getDisplayTemplate(`<span class="good-event"> - Reproducing - </span><span>${this.name}</span>`, true, "space-around"));
     }

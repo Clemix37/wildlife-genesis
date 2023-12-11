@@ -33,7 +33,8 @@ class Ecosystem {
             const nextLife = __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_getNextLife).call(this);
             if (nextLife instanceof Animal_1.default) {
                 nextLife.live(this.population);
-                this.deads = [...this.deads, ...this.population.filter(theLife => !theLife.alive)];
+                const idsOfDeads = [...this.deads.map(dead => dead.id)];
+                this.deads = [...this.deads, ...this.population.filter(theLife => !theLife.alive && !idsOfDeads.includes(theLife.id))];
                 this.population = this.population.filter(theLife => theLife.alive);
             }
             else if (nextLife instanceof Plant_1.default)
@@ -53,8 +54,10 @@ _Ecosystem_instances = new WeakSet(), _Ecosystem_checkForActionsAfterSimulation 
     return this.population[this.indexLife];
 }, _Ecosystem_actionAfterKill = function _Ecosystem_actionAfterKill(actualLife) {
     Utils_1.default.itemHasBeenKilled = false;
-    // We add the new dead
-    this.deads.push(actualLife);
+    const idsOfDeads = [...this.deads.map(dead => dead.id)];
+    // We add the new dead if not already in here
+    if (!idsOfDeads.includes(actualLife.id))
+        this.deads.push(actualLife);
     // We remove the killed one from population
     this.population = this.population.filter(aLife => aLife.id !== actualLife.id);
 }, _Ecosystem_actionAfterReproduce = function _Ecosystem_actionAfterReproduce(actualLife) {

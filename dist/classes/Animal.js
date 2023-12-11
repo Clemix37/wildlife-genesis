@@ -25,17 +25,17 @@ class Animal extends Life_1.default {
     //#endregion
     //#region Public methods
     live(population) {
-        const plants = population.filter(theLife => theLife instanceof Plant_1.default && theLife.eatable);
-        const possiblePlantToEat = plants.length > 0 ? plants[Utils_1.default.getRandomIndex(plants)] : null;
         const fctName = __classPrivateFieldGet(this, _Animal_instances, "m", _Animal_getRandomAction).call(this);
         if (fctName === "eat")
-            this.eat(possiblePlantToEat);
+            this.eat(population);
         else if (fctName === "kill")
             this.kill();
         else if (fctName === "reproduce")
-            this.reproduce();
+            this.reproduce(population);
     }
-    eat(lifeToEat) {
+    eat(population) {
+        const plants = population.filter(theLife => theLife instanceof Plant_1.default && theLife.eatable);
+        const lifeToEat = plants.length > 0 ? plants[Utils_1.default.getRandomIndex(plants)] : null;
         const display = __classPrivateFieldGet(this, _Animal_instances, "m", _Animal_getTmplEating).call(this, lifeToEat);
         if (!!lifeToEat)
             lifeToEat.alive = false;
@@ -46,7 +46,11 @@ class Animal extends Life_1.default {
         this.alive = false;
         Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "space-around"));
     }
-    reproduce() {
+    reproduce(population) {
+        const animals = population.filter(theLife => theLife instanceof Animal && theLife.id !== this.id);
+        const animalToReproduceWith = animals.length > 0 ? animals[Utils_1.default.getRandomIndex(animals)] : null;
+        if (!animalToReproduceWith)
+            return Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Error - </span><span>No reproduction without other animal (${this.name})</span>`, true, "space-around"));
         Utils_1.default.itemHasReproduced = true;
         Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="good-event"> - Reproducing - </span><span>${this.name}</span>`, true, "space-around"));
     }

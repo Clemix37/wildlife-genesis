@@ -37,7 +37,8 @@ export default class Ecosystem implements IEcosystem {
             const nextLife:Life = this.#getNextLife();
             if(nextLife instanceof Animal){
                 nextLife.live(this.population);
-                this.deads = [...this.deads, ...this.population.filter(theLife => !theLife.alive)];
+                const idsOfDeads = [...this.deads.map(dead => dead.id)];
+                this.deads = [...this.deads, ...this.population.filter(theLife => !theLife.alive && !idsOfDeads.includes(theLife.id))];
                 this.population = this.population.filter(theLife => theLife.alive);
             }
             else if(nextLife instanceof Plant) nextLife.live();
@@ -62,8 +63,9 @@ export default class Ecosystem implements IEcosystem {
 
     #actionAfterKill(actualLife:Life):void{
         Utils.itemHasBeenKilled = false;
-        // We add the new dead
-        this.deads.push(actualLife);
+        const idsOfDeads = [...this.deads.map(dead => dead.id)];
+        // We add the new dead if not already in here
+        if(!idsOfDeads.includes(actualLife.id)) this.deads.push(actualLife);
         // We remove the killed one from population
         this.population = this.population.filter(aLife => aLife.id !== actualLife.id);
     }
