@@ -16,20 +16,49 @@ class Plant extends Life_1.default {
     //#endregion
     //#region Constructor
     constructor({ name, eatable = true }) {
-        const actions = ["grow"];
-        super({ name, actions, icon: "🪴" });
+        const actionsProba = [
+            {
+                value: "grow",
+                weight: 10,
+            },
+            {
+                value: "reproduce",
+                weight: 3,
+            },
+            {
+                value: "kill",
+                weight: 1,
+            }
+        ];
+        super({ name, actionsProba, icon: "🪴" });
         _Plant_instances.add(this);
         this.eatable = eatable;
     }
     //#endregion
     //#region Public methods
-    live() {
+    live(population) {
         const fctName = __classPrivateFieldGet(this, _Plant_instances, "m", _Plant_getRandomAction).call(this);
         if (fctName === "grow")
             this.grow();
+        if (fctName === "kill")
+            this.kill();
+        if (fctName === "reproduce")
+            this.reproduce();
+    }
+    kill() {
+        this.alive = false;
+        Utils_1.default.itemHasBeenKilled = true;
+        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "space-around"));
     }
     grow() {
         Content_1.default.display(__classPrivateFieldGet(this, _Plant_instances, "m", _Plant_getDisplayTemplate).call(this));
+    }
+    reproduce() {
+        Utils_1.default.itemHasReproduced = true;
+        Content_1.default.display(Utils_1.default.getDisplayTemplate(`
+            <span class="good-event"> - Reproducing ${this.icon} - </span>
+            <span>${this.name}</span>
+        `, true, "space-around"));
     }
 }
 _Plant_instances = new WeakSet(), _Plant_getDisplayTemplate = function _Plant_getDisplayTemplate() {

@@ -7,7 +7,9 @@ class Utils {
     itemHasToBeDelete:boolean;
     itemHasReproduced:boolean;
     itemHasBeenKilled:boolean;
+    itemHasEaten:boolean;
     delayBetweenActions:number;
+    daysWithoutFoodBeforeDeath:number;
 
     //#endregion
 
@@ -17,7 +19,9 @@ class Utils {
         this.itemHasReproduced = false;
         this.itemHasToBeDelete = false;
         this.itemHasBeenKilled = false;
+        this.itemHasEaten = false;
         this.delayBetweenActions = 2000;
+        this.daysWithoutFoodBeforeDeath = 5;
     }
 
     //#endregion

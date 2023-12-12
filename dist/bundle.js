@@ -18,13 +18,31 @@ class Animal extends Life_1.default {
     //#endregion
     //#region Constructor
     constructor({ name, race }) {
-        const actions = ["eat", "kill", "reproduce"];
-        super({ name, actions, icon: "🐶" });
+        const actionsProba = [
+            {
+                value: "eat",
+                weight: 3,
+            },
+            {
+                value: "reproduce",
+                weight: 2,
+            },
+            {
+                value: "kill",
+                weight: 1,
+            },
+        ];
+        super({ name, actionsProba, icon: "🐶" });
         _Animal_instances.add(this);
         this.race = race;
+        this.daysWithoutFood = 0;
     }
     //#endregion
     //#region Public methods
+    /**
+     * Call a random action
+     * @param population Life[]
+     */
     live(population) {
         const fctName = __classPrivateFieldGet(this, _Animal_instances, "m", _Animal_getRandomAction).call(this);
         if (fctName === "eat")
@@ -35,18 +53,39 @@ class Animal extends Life_1.default {
             this.reproduce(population);
     }
     eat(population) {
+        // We get the plant to eat
         const plants = population.filter(theLife => theLife instanceof Plant_1.default && theLife.eatable);
         const lifeToEat = plants.length > 0 ? plants[Utils_1.default.getRandomIndex(plants)] : null;
-        const display = __classPrivateFieldGet(this, _Animal_instances, "m", _Animal_getTmplEating).call(this, lifeToEat);
+        // We change the nb of days without eating 
+        if (!lifeToEat)
+            this.daysWithoutFood++;
+        else
+            this.daysWithoutFood = 0;
+        // If it's been too long since eating, we let it die
+        if (this.daysWithoutFood >= Utils_1.default.daysWithoutFoodBeforeDeath)
+            return this.kill();
+        // We specify that the actual item has eaten and if it's still alive
+        Utils_1.default.itemHasEaten = true;
         if (!!lifeToEat)
             lifeToEat.alive = false;
-        Content_1.default.display(display);
+        // We display the action on screen
+        Content_1.default.display(__classPrivateFieldGet(this, _Animal_instances, "m", _Animal_getTmplEating).call(this, lifeToEat));
     }
+    /**
+     * We tell the item has been killed and is not alive anymore
+     * And display the message
+     */
     kill() {
         Utils_1.default.itemHasBeenKilled = true;
         this.alive = false;
         Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "space-around"));
     }
+    /**
+     * Get an animal to reproduce with
+     * Display the reproduction if possible
+     * @param population ILife[]
+     * @returns void
+     */
     reproduce(population) {
         const animals = population.filter(theLife => theLife instanceof Animal && theLife.id !== this.id);
         const animalToReproduceWith = animals.length > 0 ? animals[Utils_1.default.getRandomIndex(animals)] : null;
@@ -113,6 +152,12 @@ exports.default = new Content();
 
 },{}],3:[function(require,module,exports){
 "use strict";
+var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
+    if (kind === "m") throw new TypeError("Private method is not writable");
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+};
 var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
     if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
@@ -121,7 +166,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _Ecosystem_instances, _Ecosystem_checkForActionsAfterSimulation, _Ecosystem_getNextLife, _Ecosystem_actionAfterKill, _Ecosystem_actionAfterReproduce, _Ecosystem_displayPopulationAndDeads;
+var _Ecosystem_instances, _Ecosystem_interval, _Ecosystem_changeProbabilities, _Ecosystem_checkForActionsAfterSimulation, _Ecosystem_getNextLife, _Ecosystem_actionAfterEating, _Ecosystem_actionAfterKill, _Ecosystem_actionAfterReproduce;
 Object.defineProperty(exports, "__esModule", { value: true });
 const Animal_1 = __importDefault(require("./Animal"));
 const Content_1 = __importDefault(require("./Content"));
@@ -132,9 +177,11 @@ class Ecosystem {
     //#region Constructor
     constructor({ population, deads }) {
         _Ecosystem_instances.add(this);
+        _Ecosystem_interval.set(this, void 0);
         this.population = population;
         this.deads = deads;
         this.indexLife = -1;
+        __classPrivateFieldSet(this, _Ecosystem_interval, null, "f");
     }
     //#endregion
     //#region Public methods
@@ -142,30 +189,89 @@ class Ecosystem {
         this.population.push(...lives);
     }
     simulate() {
-        __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_displayPopulationAndDeads).call(this);
-        setInterval(() => {
+        // Only if simulation has been cleared
+        if (!!__classPrivateFieldGet(this, _Ecosystem_interval, "f"))
+            return;
+        this.displayPopulationAndDeads();
+        __classPrivateFieldSet(this, _Ecosystem_interval, setInterval(() => {
             const nextLife = __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_getNextLife).call(this);
-            if (nextLife instanceof Animal_1.default) {
-                nextLife.live(this.population);
-                const idsOfDeads = [...this.deads.map(dead => dead.id)];
-                this.deads = [...this.deads, ...this.population.filter(theLife => !theLife.alive && !idsOfDeads.includes(theLife.id))];
-                this.population = this.population.filter(theLife => theLife.alive);
-            }
-            else if (nextLife instanceof Plant_1.default)
-                nextLife.live();
+            nextLife.live(this.population);
             __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_checkForActionsAfterSimulation).call(this, nextLife);
-            __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_displayPopulationAndDeads).call(this);
-        }, Utils_1.default.delayBetweenActions);
+            this.displayPopulationAndDeads();
+            __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_changeProbabilities).call(this);
+            if (this.population.length === 0 && !!__classPrivateFieldGet(this, _Ecosystem_interval, "f")) {
+                clearInterval(__classPrivateFieldGet(this, _Ecosystem_interval, "f"));
+                __classPrivateFieldSet(this, _Ecosystem_interval, null, "f");
+            }
+        }, Utils_1.default.delayBetweenActions), "f");
+    }
+    displayPopulationAndDeads() {
+        let display = "";
+        const everyone = [...this.population, ...this.deads];
+        for (let i = 0; i < everyone.length; i++) {
+            const theLife = everyone[i];
+            display += Utils_1.default.getDisplayTemplate(theLife.alive ? `<span class="good-event"> - ❤️ - </span><span>${theLife.icon} - ${theLife.name}</span>`
+                : `<span class="bad-event"> - 💀 - </span><span>${theLife.icon} - ${theLife.name}</span>`, true, "space-around");
+        }
+        Content_1.default.displayPopulation(Utils_1.default.getDisplayTemplate(display, false));
     }
 }
-_Ecosystem_instances = new WeakSet(), _Ecosystem_checkForActionsAfterSimulation = function _Ecosystem_checkForActionsAfterSimulation(actualLife) {
+_Ecosystem_interval = new WeakMap(), _Ecosystem_instances = new WeakSet(), _Ecosystem_changeProbabilities = function _Ecosystem_changeProbabilities() {
+    const plants = this.population.filter(theLife => theLife instanceof Plant_1.default);
+    const animals = this.population.filter(theLife => theLife instanceof Animal_1.default);
+    // We change the probabilities of animals
+    const animalProba = [
+        {
+            value: "eat",
+            weight: (plants.length * 2) - (animals.length - 1),
+        },
+        {
+            value: "reproduce",
+            weight: plants.length - (animals.length - 1),
+        },
+        {
+            value: "kill",
+            weight: plants.length <= 0 ? animals.length : (animals.length > 0 ? (1 / animals.length) : 0), //(plants.length / 2) - (animals.length -1),
+        },
+    ];
+    console.log(animalProba);
+    for (let i = 0; i < animals.length; i++) {
+        const animal = animals[i];
+        animal.changeProbabilities(animalProba);
+    }
+    // We change the probabilities of plants
+    const plantProba = [
+        {
+            value: "grow",
+            weight: plants.length * 2,
+        },
+        {
+            value: "reproduce",
+            weight: plants.length,
+        },
+        {
+            value: "kill",
+            weight: plants.length / 2,
+        },
+    ];
+    for (let i = 0; i < plants.length; i++) {
+        const plant = plants[i];
+        plant.changeProbabilities(plantProba);
+    }
+}, _Ecosystem_checkForActionsAfterSimulation = function _Ecosystem_checkForActionsAfterSimulation(actualLife) {
     if (Utils_1.default.itemHasBeenKilled)
         __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_actionAfterKill).call(this, actualLife);
     else if (Utils_1.default.itemHasReproduced)
         __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_actionAfterReproduce).call(this, actualLife);
+    else if (Utils_1.default.itemHasEaten)
+        __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_actionAfterEating).call(this);
 }, _Ecosystem_getNextLife = function _Ecosystem_getNextLife() {
     this.indexLife = this.indexLife >= this.population.length - 1 ? 0 : this.indexLife + 1;
     return this.population[this.indexLife];
+}, _Ecosystem_actionAfterEating = function _Ecosystem_actionAfterEating() {
+    const idsDeads = [...this.deads.map(dead => dead.id)];
+    this.deads = [...this.deads, ...this.population.filter(theLife => !theLife.alive && !idsDeads.includes(theLife.id))];
+    this.population = [...this.population.filter(theLife => !!theLife.alive)];
 }, _Ecosystem_actionAfterKill = function _Ecosystem_actionAfterKill(actualLife) {
     Utils_1.default.itemHasBeenKilled = false;
     const idsOfDeads = [...this.deads.map(dead => dead.id)];
@@ -178,7 +284,7 @@ _Ecosystem_instances = new WeakSet(), _Ecosystem_checkForActionsAfterSimulation 
     Utils_1.default.itemHasReproduced = false;
     // Create the animal
     if (actualLife instanceof Animal_1.default) {
-        const newAnimal = new Animal_1.default({ name: `${actualLife.name} Jr`, race: actualLife.race });
+        const newAnimal = new Animal_1.default({ name: `${actualLife.name} Jr.`, race: actualLife.race });
         this.addLives(newAnimal);
     }
     // Create the plant
@@ -186,36 +292,57 @@ _Ecosystem_instances = new WeakSet(), _Ecosystem_checkForActionsAfterSimulation 
         const newPlant = new Plant_1.default({ name: actualLife.name, eatable: actualLife.eatable });
         this.addLives(newPlant);
     }
-}, _Ecosystem_displayPopulationAndDeads = function _Ecosystem_displayPopulationAndDeads() {
-    let display = "";
-    const everyone = [...this.population, ...this.deads];
-    for (let i = 0; i < everyone.length; i++) {
-        const theLife = everyone[i];
-        display += Utils_1.default.getDisplayTemplate(theLife.alive ? `<span class="good-event">❤️ - ${theLife.icon} - ${theLife.name}</span>`
-            : `<span class="bad-event">💀 - ${theLife.icon} - ${theLife.name}</span>`, true, "space-around");
-    }
-    Content_1.default.displayPopulation(Utils_1.default.getDisplayTemplate(display, false));
 };
 exports.default = Ecosystem;
 
 },{"./Animal":1,"./Content":2,"./Plant":5,"./Utils":6}],4:[function(require,module,exports){
 "use strict";
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+};
+var _Life_instances, _Life_generateActionsBasedOnProba;
 Object.defineProperty(exports, "__esModule", { value: true });
 const uuid_1 = require("uuid");
 class Life {
     //#endregion
     //#region Constructor
-    constructor({ name, actions, icon }) {
+    constructor({ name, actionsProba, icon }) {
+        _Life_instances.add(this);
         this.id = (0, uuid_1.v4)();
         this.name = name;
-        this.actions = actions;
+        this.actionsProba = actionsProba;
+        this.actions = __classPrivateFieldGet(this, _Life_instances, "m", _Life_generateActionsBasedOnProba).call(this);
         this.alive = true;
         this.icon = icon;
     }
     //#endregion
     //#region Public methods
     live(thing) { }
+    changeProbabilities(probas) {
+        this.actionsProba = probas;
+        this.actions = __classPrivateFieldGet(this, _Life_instances, "m", _Life_generateActionsBasedOnProba).call(this);
+    }
+    changeUniqueProba(proba) {
+        const probaSaved = this.actionsProba.find(prob => prob.value === proba.value);
+        if (!probaSaved)
+            return;
+        probaSaved.weight = proba.weight;
+        __classPrivateFieldGet(this, _Life_instances, "m", _Life_generateActionsBasedOnProba).call(this);
+    }
 }
+_Life_instances = new WeakSet(), _Life_generateActionsBasedOnProba = function _Life_generateActionsBasedOnProba() {
+    const actions = [];
+    for (let i = 0; i < this.actionsProba.length; i++) {
+        const actionProba = this.actionsProba[i];
+        const nb = actionProba.weight * 100;
+        for (let j = 0; j < nb; j++) {
+            actions.push(actionProba.value);
+        }
+    }
+    return actions.sort((a, b) => 0.5 - Math.random());
+};
 exports.default = Life;
 
 },{"uuid":8}],5:[function(require,module,exports){
@@ -237,20 +364,49 @@ class Plant extends Life_1.default {
     //#endregion
     //#region Constructor
     constructor({ name, eatable = true }) {
-        const actions = ["grow"];
-        super({ name, actions, icon: "🪴" });
+        const actionsProba = [
+            {
+                value: "grow",
+                weight: 10,
+            },
+            {
+                value: "reproduce",
+                weight: 3,
+            },
+            {
+                value: "kill",
+                weight: 1,
+            }
+        ];
+        super({ name, actionsProba, icon: "🪴" });
         _Plant_instances.add(this);
         this.eatable = eatable;
     }
     //#endregion
     //#region Public methods
-    live() {
+    live(population) {
         const fctName = __classPrivateFieldGet(this, _Plant_instances, "m", _Plant_getRandomAction).call(this);
         if (fctName === "grow")
             this.grow();
+        if (fctName === "kill")
+            this.kill();
+        if (fctName === "reproduce")
+            this.reproduce();
+    }
+    kill() {
+        this.alive = false;
+        Utils_1.default.itemHasBeenKilled = true;
+        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "space-around"));
     }
     grow() {
         Content_1.default.display(__classPrivateFieldGet(this, _Plant_instances, "m", _Plant_getDisplayTemplate).call(this));
+    }
+    reproduce() {
+        Utils_1.default.itemHasReproduced = true;
+        Content_1.default.display(Utils_1.default.getDisplayTemplate(`
+            <span class="good-event"> - Reproducing ${this.icon} - </span>
+            <span>${this.name}</span>
+        `, true, "space-around"));
     }
 }
 _Plant_instances = new WeakSet(), _Plant_getDisplayTemplate = function _Plant_getDisplayTemplate() {
@@ -273,7 +429,9 @@ class Utils {
         this.itemHasReproduced = false;
         this.itemHasToBeDelete = false;
         this.itemHasBeenKilled = false;
+        this.itemHasEaten = false;
         this.delayBetweenActions = 2000;
+        this.daysWithoutFoodBeforeDeath = 5;
     }
     //#endregion
     //#region Public methods
@@ -300,7 +458,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Animal_1 = __importDefault(require("./classes/Animal"));
 const Ecosystem_1 = __importDefault(require("./classes/Ecosystem"));
 const Plant_1 = __importDefault(require("./classes/Plant"));
-const DELAY_BETWEEN_SIMULATIONS = 5000;
+const LBL_NAME_ANIMAL = document.getElementById("txtNameAnimal");
+const LBL_TYPE_ANIMAL = document.getElementById("txtTypeAnimal");
+const LBL_NAME_PLANT = document.getElementById("txtNamePlant");
+const CHECK_EATABLE_PLANT = document.getElementById("checkIsEatable");
 const BTNS = {
     ADD: {
         ANIMAL: document.getElementById("btnAddAnimal"),
@@ -312,13 +473,26 @@ const ecosystem = new Ecosystem_1.default({ population: [], deads: [] });
 function bindPageEvents() {
     // Add the animal
     BTNS.ADD.ANIMAL.addEventListener("click", () => {
-        const a = new Animal_1.default({ name: "Dog", race: "Labrador" });
-        ecosystem.addLives(a);
+        const name = !!LBL_NAME_ANIMAL.value ? LBL_NAME_ANIMAL.value : "Dog";
+        const race = !!LBL_TYPE_ANIMAL.value ? LBL_TYPE_ANIMAL.value : "Labrador";
+        const newAnimal = new Animal_1.default({ name, race });
+        ecosystem.addLives(newAnimal);
+        LBL_NAME_ANIMAL.value = "";
+        LBL_TYPE_ANIMAL.value = "";
+        ecosystem.displayPopulationAndDeads();
+        ecosystem.simulate(); // We simulate only if simulation has ended
     });
     // Add the plant
     BTNS.ADD.PLANT.addEventListener("click", () => {
-        const p = new Plant_1.default({ name: "Flower" });
-        ecosystem.addLives(p);
+        const name = !!LBL_NAME_PLANT.value ? LBL_NAME_PLANT.value : "Flower";
+        const eatable = CHECK_EATABLE_PLANT.checked;
+        console.log(LBL_NAME_PLANT.value, name, eatable);
+        const newPlant = new Plant_1.default({ name, eatable });
+        ecosystem.addLives(newPlant);
+        LBL_NAME_PLANT.value = "";
+        CHECK_EATABLE_PLANT.checked = false;
+        ecosystem.displayPopulationAndDeads();
+        ecosystem.simulate(); // We simulate only if simulation has ended
     });
 }
 //#endregion

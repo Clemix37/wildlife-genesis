@@ -2,7 +2,10 @@ import Animal from "./classes/Animal";
 import Ecosystem from "./classes/Ecosystem";
 import Plant from "./classes/Plant";
 
-const DELAY_BETWEEN_SIMULATIONS = 5000;
+const LBL_NAME_ANIMAL:HTMLInputElement = document.getElementById("txtNameAnimal") as HTMLInputElement;
+const LBL_TYPE_ANIMAL:HTMLInputElement = document.getElementById("txtTypeAnimal") as HTMLInputElement;
+const LBL_NAME_PLANT:HTMLInputElement = document.getElementById("txtNamePlant") as HTMLInputElement;
+const CHECK_EATABLE_PLANT:HTMLInputElement = document.getElementById("checkIsEatable") as HTMLInputElement;
 
 const BTNS: {
     ADD: {
@@ -22,13 +25,26 @@ const ecosystem:Ecosystem = new Ecosystem({population: [], deads: []});
 function bindPageEvents(){
     // Add the animal
     BTNS.ADD.ANIMAL.addEventListener("click", () => {
-        const a = new Animal({name:"Dog",race:"Labrador"});
-        ecosystem.addLives(a);
+        const name = !!LBL_NAME_ANIMAL.value ? LBL_NAME_ANIMAL.value : "Dog";
+        const race = !!LBL_TYPE_ANIMAL.value ? LBL_TYPE_ANIMAL.value : "Labrador";
+        const newAnimal = new Animal({name,race});
+        ecosystem.addLives(newAnimal);
+        LBL_NAME_ANIMAL.value = "";
+        LBL_TYPE_ANIMAL.value = "";
+        ecosystem.displayPopulationAndDeads();
+        ecosystem.simulate(); // We simulate only if simulation has ended
     });
     // Add the plant
     BTNS.ADD.PLANT.addEventListener("click", () => {
-        const p = new Plant({name:"Flower"});
-        ecosystem.addLives(p);
+        const name = !!LBL_NAME_PLANT.value ? LBL_NAME_PLANT.value : "Flower";
+        const eatable = CHECK_EATABLE_PLANT.checked;
+        console.log(LBL_NAME_PLANT.value, name, eatable);
+        const newPlant = new Plant({name,eatable});
+        ecosystem.addLives(newPlant);
+        LBL_NAME_PLANT.value = "";
+        CHECK_EATABLE_PLANT.checked = false;
+        ecosystem.displayPopulationAndDeads();
+        ecosystem.simulate(); // We simulate only if simulation has ended
     });
 }
 

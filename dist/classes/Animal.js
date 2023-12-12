@@ -17,13 +17,31 @@ class Animal extends Life_1.default {
     //#endregion
     //#region Constructor
     constructor({ name, race }) {
-        const actions = ["eat", "kill", "reproduce"];
-        super({ name, actions, icon: "🐶" });
+        const actionsProba = [
+            {
+                value: "eat",
+                weight: 3,
+            },
+            {
+                value: "reproduce",
+                weight: 2,
+            },
+            {
+                value: "kill",
+                weight: 1,
+            },
+        ];
+        super({ name, actionsProba, icon: "🐶" });
         _Animal_instances.add(this);
         this.race = race;
+        this.daysWithoutFood = 0;
     }
     //#endregion
     //#region Public methods
+    /**
+     * Call a random action
+     * @param population Life[]
+     */
     live(population) {
         const fctName = __classPrivateFieldGet(this, _Animal_instances, "m", _Animal_getRandomAction).call(this);
         if (fctName === "eat")
@@ -34,18 +52,39 @@ class Animal extends Life_1.default {
             this.reproduce(population);
     }
     eat(population) {
+        // We get the plant to eat
         const plants = population.filter(theLife => theLife instanceof Plant_1.default && theLife.eatable);
         const lifeToEat = plants.length > 0 ? plants[Utils_1.default.getRandomIndex(plants)] : null;
-        const display = __classPrivateFieldGet(this, _Animal_instances, "m", _Animal_getTmplEating).call(this, lifeToEat);
+        // We change the nb of days without eating 
+        if (!lifeToEat)
+            this.daysWithoutFood++;
+        else
+            this.daysWithoutFood = 0;
+        // If it's been too long since eating, we let it die
+        if (this.daysWithoutFood >= Utils_1.default.daysWithoutFoodBeforeDeath)
+            return this.kill();
+        // We specify that the actual item has eaten and if it's still alive
+        Utils_1.default.itemHasEaten = true;
         if (!!lifeToEat)
             lifeToEat.alive = false;
-        Content_1.default.display(display);
+        // We display the action on screen
+        Content_1.default.display(__classPrivateFieldGet(this, _Animal_instances, "m", _Animal_getTmplEating).call(this, lifeToEat));
     }
+    /**
+     * We tell the item has been killed and is not alive anymore
+     * And display the message
+     */
     kill() {
         Utils_1.default.itemHasBeenKilled = true;
         this.alive = false;
         Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "space-around"));
     }
+    /**
+     * Get an animal to reproduce with
+     * Display the reproduction if possible
+     * @param population ILife[]
+     * @returns void
+     */
     reproduce(population) {
         const animals = population.filter(theLife => theLife instanceof Animal && theLife.id !== this.id);
         const animalToReproduceWith = animals.length > 0 ? animals[Utils_1.default.getRandomIndex(animals)] : null;
