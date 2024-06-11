@@ -4,12 +4,12 @@ class Utils {
 
     //#region Properties
 
-    itemHasToBeDelete:boolean;
-    itemHasReproduced:boolean;
-    itemHasBeenKilled:boolean;
-    itemHasEaten:boolean;
-    delayBetweenActions:number;
-    daysWithoutFoodBeforeDeath:number;
+    itemHasToBeDelete: boolean;
+    itemHasReproduced: boolean;
+    itemHasBeenKilled: boolean;
+    itemHasEaten: boolean;
+    delayBetweenActions: number;
+    daysWithoutFoodBeforeDeath: number;
 
     //#endregion
 
@@ -28,12 +28,12 @@ class Utils {
 
     //#region Public methods
 
-    getRandomIndex(tab:any[]):number{
+    getRandomIndex(tab: any[]): number {
         return Math.floor(Math.random() * tab.length);
     }
 
-    getDisplayTemplate(content:string, isLine:boolean = true, additionnalClasses:string = ""):string{
-        const classes = `${isLine ? "ligne" : "colonne"} ${additionnalClasses}`;
+    getDisplayTemplate(content: string, isLine: boolean = true, additionnalClasses: string = ""): string {
+        const classes = `${isLine ? "flex width-100" : "flex colonne width-100"} ${additionnalClasses}`;
         return `
             <div class="${classes}">
                 ${content}

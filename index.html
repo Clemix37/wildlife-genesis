@@ -7,51 +7,49 @@
     <link rel="stylesheet" href="./styles/app.css">
 </head>
 <body>
-    <div class="ligne">
-        <div class="colonne is-self-start">
-            <fieldset class="ligne">
-                <legend>Animal</legend>
-                <div class="colonne">
-                    <div class="ligne">
-                        <label for="txtNameAnimal">Name:</label>
-                        <input type="text" id="txtNameAnimal" />
-                    </div>
-                    <div class="ligne">
-                        <label for="txtTypeAnimal">Type:</label>
-                        <input type="text" id="txtTypeAnimal" />
-                    </div>
-                    <div class="ligne">
-                        <button id="btnAddAnimal">➕ Animal</button>
-                    </div>
+    <div class="flex">
+        <fieldset class="flex colonne width-100">
+            <legend>Animal</legend>
+            <div class="flex colonne">
+                <div class="flex">
+                    <label for="txtNameAnimal">Name:</label>
+                    <input type="text" id="txtNameAnimal" />
                 </div>
-            </fieldset>
-            <fieldset class="ligne">
-                <legend>Plant</legend>
-                <div class="colonne">
-                    <div class="ligne">
-                        <label for="txtNamePlant">Name:</label>
-                        <input type="text" id="txtNamePlant" />
-                    </div>
-                    <div class="ligne">
-                        <input type="checkbox" id="checkIsEatable" />
-                        <label for="checkIsEatable">Eatable</label>
-                    </div>
-                    <div class="ligne">
-                        <button id="btnAddPlant">➕ Plant</button>
-                    </div>
+                <div class="flex">
+                    <label for="txtTypeAnimal">Type:</label>
+                    <input type="text" id="txtTypeAnimal" />
                 </div>
-            </fieldset>
+                <div class="flex">
+                    <button id="btnAddAnimal">➕ Animal</button>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="flex colonne width-100">
+            <legend>Plant</legend>
+            <div class="flex colonne">
+                <div class="flex">
+                    <label for="txtNamePlant">Name:</label>
+                    <input type="text" id="txtNamePlant" />
+                </div>
+                <div class="flex">
+                    <input type="checkbox" id="checkIsEatable" />
+                    <label for="checkIsEatable">Eatable</label>
+                </div>
+                <div class="flex">
+                    <button id="btnAddPlant">➕ Plant</button>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+    <div class="flex">
+        <div class="flex colonne is-self-start width-100">
             <!-- Displaying the actual population -->
-            <div class="ligne" id="population">
+            <div class="flex justify-content-center" id="population">
                 
             </div>
         </div>
-        <div class="colonne is-self-start">
-            <div class="ligne">
-                <div class="colonne" id="content">
-
-                </div>
-            </div>
+        <div class="flex colonne is-self-start width-100 align-items-center" id="content">
+            <!-- GENERATED -->
         </div>
     </div>
 

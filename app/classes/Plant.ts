@@ -8,14 +8,14 @@ export default class Plant extends Life implements IPlant {
     
     //#region Properties
 
-    eatable:boolean;
+    eatable: boolean;
 
     //#endregion
 
     //#region Constructor
 
-    constructor({name,eatable=true}:{name:string,eatable?:boolean}){
-        const actionsProba:IProbability[] = [
+    constructor({ name, eatable = true }: { name: string, eatable?: boolean }){
+        const actionsProba: IProbability[] = [
             {
                 value:"grow",
                 weight: 10,
@@ -29,7 +29,7 @@ export default class Plant extends Life implements IPlant {
                 weight: 1,
             }
         ];
-        super({name, actionsProba, icon: "🪴"});
+        super({ name, actionsProba, icon: "🪴" });
         this.eatable = eatable;
     }
 
@@ -37,43 +37,43 @@ export default class Plant extends Life implements IPlant {
 
     //#region Public methods
 
-    live(population:Life[]):void{
+    live(population: Life[]): void {
         const fctName = this.#getRandomAction();
         if(fctName === "grow") this.grow();
         if(fctName === "kill") this.kill();
         if(fctName === "reproduce") this.reproduce();
     }
 
-    kill():void{
+    kill(): void {
         this.alive = false;
         Utils.itemHasBeenKilled = true;
-        Content.display(Utils.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "space-around"));
+        Content.display(Utils.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "justify-content-space-around"));
     }
 
-    grow():void{
+    grow(): void {
         Content.display(this.#getDisplayTemplate());
     }
 
-    reproduce():void{
+    reproduce(): void {
         Utils.itemHasReproduced = true;
         Content.display(Utils.getDisplayTemplate(`
             <span class="good-event"> - Reproducing ${this.icon} - </span>
             <span>${this.name}</span>
-        `, true, "space-around"));
+        `, true, "justify-content-space-around"));
     }
 
     //#endregion
 
     //#region Private methods
 
-    #getDisplayTemplate():string{
+    #getDisplayTemplate(): string {
         return Utils.getDisplayTemplate(`
             <span class="good-event"> - Growing - </span>
             <span>${this.name}</span>
-        `, true, "space-around");
+        `, true, "justify-content-space-around");
     }
 
-    #getRandomAction():string{
+    #getRandomAction(): string {
         return this.actions[Utils.getRandomIndex(this.actions)];
     }
 

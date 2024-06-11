@@ -3,10 +3,10 @@ class Content {
     
     //#region properties
 
-    #id:string;
-    #idPopulation:string;
-    #element:HTMLElement;
-    #populationElement:HTMLElement;
+    #id: string;
+    #idPopulation: string;
+    #element: HTMLElement;
+    #populationElement: HTMLElement;
 
     //#endregion
 
@@ -23,12 +23,20 @@ class Content {
 
     //#region Public methods
 
-    display(dom:string):void{
-        this.#element.innerHTML += dom;
+    /**
+     * We display the content given in first so that recent elements appears in first
+     * @param newDomContent 
+     */
+    display(newDomContent: string): void {
+        this.#element.innerHTML = newDomContent + this.#element.innerHTML;
     }
 
-    displayPopulation(dom:string):void{
-        this.#populationElement.innerHTML = dom;
+    /**
+     * Display the content given in the population element
+     * @param completeDomContent 
+     */
+    displayPopulation(completeDomContent: string): void {
+        this.#populationElement.innerHTML = completeDomContent;
     }
 
     //#endregion

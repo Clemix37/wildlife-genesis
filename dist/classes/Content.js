@@ -28,11 +28,19 @@ class Content {
     }
     //#endregion
     //#region Public methods
-    display(dom) {
-        __classPrivateFieldGet(this, _Content_element, "f").innerHTML += dom;
+    /**
+     * We display the content given in first so that recent elements appears in first
+     * @param newDomContent
+     */
+    display(newDomContent) {
+        __classPrivateFieldGet(this, _Content_element, "f").innerHTML = newDomContent + __classPrivateFieldGet(this, _Content_element, "f").innerHTML;
     }
-    displayPopulation(dom) {
-        __classPrivateFieldGet(this, _Content_populationElement, "f").innerHTML = dom;
+    /**
+     * Display the content given in the population element
+     * @param completeDomContent
+     */
+    displayPopulation(completeDomContent) {
+        __classPrivateFieldGet(this, _Content_populationElement, "f").innerHTML = completeDomContent;
     }
 }
 _Content_id = new WeakMap(), _Content_idPopulation = new WeakMap(), _Content_element = new WeakMap(), _Content_populationElement = new WeakMap();

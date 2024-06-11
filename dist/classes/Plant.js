@@ -48,7 +48,7 @@ class Plant extends Life_1.default {
     kill() {
         this.alive = false;
         Utils_1.default.itemHasBeenKilled = true;
-        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "space-around"));
+        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "justify-content-space-around"));
     }
     grow() {
         Content_1.default.display(__classPrivateFieldGet(this, _Plant_instances, "m", _Plant_getDisplayTemplate).call(this));
@@ -58,14 +58,14 @@ class Plant extends Life_1.default {
         Content_1.default.display(Utils_1.default.getDisplayTemplate(`
             <span class="good-event"> - Reproducing ${this.icon} - </span>
             <span>${this.name}</span>
-        `, true, "space-around"));
+        `, true, "justify-content-space-around"));
     }
 }
 _Plant_instances = new WeakSet(), _Plant_getDisplayTemplate = function _Plant_getDisplayTemplate() {
     return Utils_1.default.getDisplayTemplate(`
             <span class="good-event"> - Growing - </span>
             <span>${this.name}</span>
-        `, true, "space-around");
+        `, true, "justify-content-space-around");
 }, _Plant_getRandomAction = function _Plant_getRandomAction() {
     return this.actions[Utils_1.default.getRandomIndex(this.actions)];
 };

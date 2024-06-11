@@ -77,7 +77,7 @@ class Animal extends Life_1.default {
     kill() {
         Utils_1.default.itemHasBeenKilled = true;
         this.alive = false;
-        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "space-around"));
+        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "justify-content-space-around"));
     }
     /**
      * Get an animal to reproduce with
@@ -89,9 +89,9 @@ class Animal extends Life_1.default {
         const animals = population.filter(theLife => theLife instanceof Animal && theLife.id !== this.id);
         const animalToReproduceWith = animals.length > 0 ? animals[Utils_1.default.getRandomIndex(animals)] : null;
         if (!animalToReproduceWith)
-            return Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Error - </span><span>No reproduction without other animal (${this.name})</span>`, true, "space-around"));
+            return Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Error - </span><span>No reproduction without other animal (${this.name})</span>`, true, "justify-content-space-around"));
         Utils_1.default.itemHasReproduced = true;
-        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="good-event"> - Reproducing - </span><span>${this.name}</span>`, true, "space-around"));
+        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="good-event"> - Reproducing - </span><span>${this.name}</span>`, true, "justify-content-space-around"));
     }
 }
 _Animal_instances = new WeakSet(), _Animal_getTmplEating = function _Animal_getTmplEating(lifeToEat) {
@@ -102,7 +102,7 @@ _Animal_instances = new WeakSet(), _Animal_getTmplEating = function _Animal_getT
             <span class="bad-event"> - Error - </span>
             <span>No plant to eat</span>
         `;
-    return Utils_1.default.getDisplayTemplate(display, true, "space-around");
+    return Utils_1.default.getDisplayTemplate(display, true, "justify-content-space-around");
 }, _Animal_getRandomAction = function _Animal_getRandomAction() {
     return this.actions[Utils_1.default.getRandomIndex(this.actions)];
 };

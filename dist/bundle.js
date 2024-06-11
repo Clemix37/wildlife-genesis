@@ -78,7 +78,7 @@ class Animal extends Life_1.default {
     kill() {
         Utils_1.default.itemHasBeenKilled = true;
         this.alive = false;
-        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "space-around"));
+        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "justify-content-space-around"));
     }
     /**
      * Get an animal to reproduce with
@@ -90,9 +90,9 @@ class Animal extends Life_1.default {
         const animals = population.filter(theLife => theLife instanceof Animal && theLife.id !== this.id);
         const animalToReproduceWith = animals.length > 0 ? animals[Utils_1.default.getRandomIndex(animals)] : null;
         if (!animalToReproduceWith)
-            return Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Error - </span><span>No reproduction without other animal (${this.name})</span>`, true, "space-around"));
+            return Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Error - </span><span>No reproduction without other animal (${this.name})</span>`, true, "justify-content-space-around"));
         Utils_1.default.itemHasReproduced = true;
-        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="good-event"> - Reproducing - </span><span>${this.name}</span>`, true, "space-around"));
+        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="good-event"> - Reproducing - </span><span>${this.name}</span>`, true, "justify-content-space-around"));
     }
 }
 _Animal_instances = new WeakSet(), _Animal_getTmplEating = function _Animal_getTmplEating(lifeToEat) {
@@ -103,7 +103,7 @@ _Animal_instances = new WeakSet(), _Animal_getTmplEating = function _Animal_getT
             <span class="bad-event"> - Error - </span>
             <span>No plant to eat</span>
         `;
-    return Utils_1.default.getDisplayTemplate(display, true, "space-around");
+    return Utils_1.default.getDisplayTemplate(display, true, "justify-content-space-around");
 }, _Animal_getRandomAction = function _Animal_getRandomAction() {
     return this.actions[Utils_1.default.getRandomIndex(this.actions)];
 };
@@ -140,11 +140,19 @@ class Content {
     }
     //#endregion
     //#region Public methods
-    display(dom) {
-        __classPrivateFieldGet(this, _Content_element, "f").innerHTML += dom;
+    /**
+     * We display the content given in first so that recent elements appears in first
+     * @param newDomContent
+     */
+    display(newDomContent) {
+        __classPrivateFieldGet(this, _Content_element, "f").innerHTML = newDomContent + __classPrivateFieldGet(this, _Content_element, "f").innerHTML;
     }
-    displayPopulation(dom) {
-        __classPrivateFieldGet(this, _Content_populationElement, "f").innerHTML = dom;
+    /**
+     * Display the content given in the population element
+     * @param completeDomContent
+     */
+    displayPopulation(completeDomContent) {
+        __classPrivateFieldGet(this, _Content_populationElement, "f").innerHTML = completeDomContent;
     }
 }
 _Content_id = new WeakMap(), _Content_idPopulation = new WeakMap(), _Content_element = new WeakMap(), _Content_populationElement = new WeakMap();
@@ -211,7 +219,7 @@ class Ecosystem {
         for (let i = 0; i < everyone.length; i++) {
             const theLife = everyone[i];
             display += Utils_1.default.getDisplayTemplate(theLife.alive ? `<span class="good-event"> - ❤️ - </span><span>${theLife.icon} - ${theLife.name}</span>`
-                : `<span class="bad-event"> - 💀 - </span><span>${theLife.icon} - ${theLife.name}</span>`, true, "space-around");
+                : `<span class="bad-event"> - 💀 - </span><span>${theLife.icon} - ${theLife.name}</span>`, true, "justify-content-space-around");
         }
         Content_1.default.displayPopulation(Utils_1.default.getDisplayTemplate(display, false));
     }
@@ -396,7 +404,7 @@ class Plant extends Life_1.default {
     kill() {
         this.alive = false;
         Utils_1.default.itemHasBeenKilled = true;
-        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "space-around"));
+        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "justify-content-space-around"));
     }
     grow() {
         Content_1.default.display(__classPrivateFieldGet(this, _Plant_instances, "m", _Plant_getDisplayTemplate).call(this));
@@ -406,14 +414,14 @@ class Plant extends Life_1.default {
         Content_1.default.display(Utils_1.default.getDisplayTemplate(`
             <span class="good-event"> - Reproducing ${this.icon} - </span>
             <span>${this.name}</span>
-        `, true, "space-around"));
+        `, true, "justify-content-space-around"));
     }
 }
 _Plant_instances = new WeakSet(), _Plant_getDisplayTemplate = function _Plant_getDisplayTemplate() {
     return Utils_1.default.getDisplayTemplate(`
             <span class="good-event"> - Growing - </span>
             <span>${this.name}</span>
-        `, true, "space-around");
+        `, true, "justify-content-space-around");
 }, _Plant_getRandomAction = function _Plant_getRandomAction() {
     return this.actions[Utils_1.default.getRandomIndex(this.actions)];
 };
@@ -439,7 +447,7 @@ class Utils {
         return Math.floor(Math.random() * tab.length);
     }
     getDisplayTemplate(content, isLine = true, additionnalClasses = "") {
-        const classes = `${isLine ? "ligne" : "colonne"} ${additionnalClasses}`;
+        const classes = `${isLine ? "flex width-100" : "flex colonne width-100"} ${additionnalClasses}`;
         return `
             <div class="${classes}">
                 ${content}

@@ -1,4 +1,4 @@
 export default interface IAnimal {
-    race:string;
-    daysWithoutFood:number;
+    race: string;
+    daysWithoutFood: number;
 }

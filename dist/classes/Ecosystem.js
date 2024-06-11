@@ -58,7 +58,7 @@ class Ecosystem {
         for (let i = 0; i < everyone.length; i++) {
             const theLife = everyone[i];
             display += Utils_1.default.getDisplayTemplate(theLife.alive ? `<span class="good-event"> - ❤️ - </span><span>${theLife.icon} - ${theLife.name}</span>`
-                : `<span class="bad-event"> - 💀 - </span><span>${theLife.icon} - ${theLife.name}</span>`, true, "space-around");
+                : `<span class="bad-event"> - 💀 - </span><span>${theLife.icon} - ${theLife.name}</span>`, true, "justify-content-space-around");
         }
         Content_1.default.displayPopulation(Utils_1.default.getDisplayTemplate(display, false));
     }

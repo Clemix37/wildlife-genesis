@@ -19,7 +19,7 @@ export default class Ecosystem implements IEcosystem {
 
     //#region Constructor
 
-    constructor({population,deads}:{population:Life[],deads:Life[]}){
+    constructor({ population, deads }: { population: Life[], deads: Life[] }){
         this.population = population;
         this.deads = deads;
         this.indexLife = -1;
@@ -30,16 +30,16 @@ export default class Ecosystem implements IEcosystem {
 
     //#region Public methods
 
-    addLives(...lives:Life[]){
+    addLives(...lives: Life[]): void {
         this.population.push(...lives);
     }
 
-    simulate(){
+    simulate(): void {
         // Only if simulation has been cleared
         if(!!this.#interval) return;
         this.displayPopulationAndDeads();
         this.#interval = setInterval(() => {
-            const nextLife:Life = this.#getNextLife();
+            const nextLife: Life = this.#getNextLife();
             nextLife.live(this.population);
             this.#checkForActionsAfterSimulation(nextLife);
             this.displayPopulationAndDeads();
@@ -51,14 +51,14 @@ export default class Ecosystem implements IEcosystem {
         }, Utils.delayBetweenActions);
     }
 
-    displayPopulationAndDeads(){
+    displayPopulationAndDeads(): void {
         let display = "";
-        const everyone = [...this.population, ...this.deads];
+        const everyone: Life[] = [...this.population, ...this.deads];
         for (let i = 0; i < everyone.length; i++) {
-            const theLife = everyone[i];
+            const theLife: Life = everyone[i];
             display += Utils.getDisplayTemplate(
                 theLife.alive ? `<span class="good-event"> - ❤️ - </span><span>${theLife.icon} - ${theLife.name}</span>`
-                    : `<span class="bad-event"> - 💀 - </span><span>${theLife.icon} - ${theLife.name}</span>`, true, "space-around");
+                    : `<span class="bad-event"> - 💀 - </span><span>${theLife.icon} - ${theLife.name}</span>`, true, "justify-content-space-around");
         }
         Content.displayPopulation(Utils.getDisplayTemplate(display, false));
     }
@@ -67,11 +67,11 @@ export default class Ecosystem implements IEcosystem {
 
     //#region Private methods
 
-    #changeProbabilities(){
-        const plants:Plant[] = this.population.filter(theLife => theLife instanceof Plant) as Plant[];
-        const animals:Animal[] = this.population.filter(theLife => theLife instanceof Animal) as Animal[];
+    #changeProbabilities(): void {
+        const plants: Plant[] = this.population.filter(theLife => theLife instanceof Plant) as Plant[];
+        const animals: Animal[] = this.population.filter(theLife => theLife instanceof Animal) as Animal[];
         // We change the probabilities of animals
-        const animalProba:IProbability[] = [
+        const animalProba: IProbability[] = [
             {
                 value: "eat",
                 weight: (plants.length * 2) - (animals.length -1),
@@ -91,7 +91,7 @@ export default class Ecosystem implements IEcosystem {
             animal.changeProbabilities(animalProba);
         }
         // We change the probabilities of plants
-        const plantProba:IProbability[] = [
+        const plantProba: IProbability[] = [
             {
                 value: "grow",
                 weight: plants.length * 2,
@@ -111,24 +111,24 @@ export default class Ecosystem implements IEcosystem {
         }
     }
 
-    #checkForActionsAfterSimulation(actualLife:Life):void{
+    #checkForActionsAfterSimulation(actualLife: Life): void {
         if(Utils.itemHasBeenKilled) this.#actionAfterKill(actualLife);
         else if(Utils.itemHasReproduced) this.#actionAfterReproduce(actualLife);
         else if(Utils.itemHasEaten) this.#actionAfterEating();
     }
 
-    #getNextLife():Life{
+    #getNextLife(): Life {
         this.indexLife = this.indexLife >= this.population.length - 1 ? 0 : this.indexLife + 1;
         return this.population[this.indexLife];
     }
 
-    #actionAfterEating():void{
+    #actionAfterEating(): void {
         const idsDeads = [...this.deads.map(dead => dead.id)];
         this.deads = [...this.deads, ...this.population.filter(theLife => !theLife.alive && !idsDeads.includes(theLife.id))];
         this.population = [...this.population.filter(theLife => !!theLife.alive)];
     }
 
-    #actionAfterKill(actualLife:Life):void{
+    #actionAfterKill(actualLife: Life): void {
         Utils.itemHasBeenKilled = false;
         const idsOfDeads = [...this.deads.map(dead => dead.id)];
         // We add the new dead if not already in here
@@ -137,16 +137,16 @@ export default class Ecosystem implements IEcosystem {
         this.population = this.population.filter(aLife => aLife.id !== actualLife.id);
     }
 
-    #actionAfterReproduce(actualLife:Life):void{
+    #actionAfterReproduce(actualLife: Life): void {
         Utils.itemHasReproduced = false;
         // Create the animal
         if(actualLife instanceof Animal){
-            const newAnimal:Animal = new Animal({name:`${actualLife.name} Jr.`, race: actualLife.race});
+            const newAnimal: Animal = new Animal({ name: `${actualLife.name} Jr.`, race: actualLife.race });
             this.addLives(newAnimal);
         }
         // Create the plant
         else if (actualLife instanceof Plant){
-            const newPlant:Plant = new Plant({name:actualLife.name, eatable: actualLife.eatable});
+            const newPlant: Plant = new Plant({ name: actualLife.name, eatable: actualLife.eatable });
             this.addLives(newPlant);
         }
     }

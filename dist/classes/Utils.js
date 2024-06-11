@@ -17,7 +17,7 @@ class Utils {
         return Math.floor(Math.random() * tab.length);
     }
     getDisplayTemplate(content, isLine = true, additionnalClasses = "") {
-        const classes = `${isLine ? "ligne" : "colonne"} ${additionnalClasses}`;
+        const classes = `${isLine ? "flex width-100" : "flex colonne width-100"} ${additionnalClasses}`;
         return `
             <div class="${classes}">
                 ${content}
