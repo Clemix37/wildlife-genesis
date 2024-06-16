@@ -13,6 +13,7 @@ export default class Ecosystem implements IEcosystem {
     population: Life[];
     deads: Life[];
     indexLife: number;
+    #isPaused: boolean;
     #interval: NodeJS.Timeout|null;
 
     //#endregion
@@ -23,12 +24,24 @@ export default class Ecosystem implements IEcosystem {
         this.population = population;
         this.deads = deads;
         this.indexLife = -1;
+        this.#isPaused = true;
         this.#interval = null;
     }
 
     //#endregion
 
     //#region Public methods
+
+    playOrPause(){
+        console.log(`Before: ${this.#isPaused}`);
+        this.#isPaused = !this.#isPaused;
+        console.log(`After: ${this.#isPaused}`);
+        // If simulation is paused, we clear the interval
+        if(this.#isPaused && !!this.#interval) this.#cancelInterval();
+        // if not, we simulate
+        else if(!this.#isPaused) this.simulate();
+        return this.#isPaused;
+    }
 
     addLives(...lives: Life[]): void {
         this.population.push(...lives);
@@ -37,6 +50,7 @@ export default class Ecosystem implements IEcosystem {
     simulate(): void {
         // Only if simulation has been cleared
         if(!!this.#interval) return;
+        console.log("simulation");
         this.displayPopulationAndDeads();
         this.#interval = setInterval(() => {
             const nextLife: Life = this.#getNextLife();
@@ -44,10 +58,7 @@ export default class Ecosystem implements IEcosystem {
             this.#checkForActionsAfterSimulation(nextLife);
             this.displayPopulationAndDeads();
             this.#changeProbabilities();
-            if(this.population.length === 0 && !!this.#interval) {
-                clearInterval(this.#interval);
-                this.#interval = null;
-            }
+            if(this.population.length === 0 && !!this.#interval) this.#cancelInterval();
         }, Utils.delayBetweenActions);
     }
 
@@ -66,6 +77,15 @@ export default class Ecosystem implements IEcosystem {
     //#endregion
 
     //#region Private methods
+
+    /**
+     * Cancel the interval
+     */
+    #cancelInterval(): void {
+        if(!this.#interval) return;
+        clearInterval(this.#interval);
+        this.#interval = null;
+    }
 
     #changeProbabilities(): void {
         const plants: Plant[] = this.population.filter(theLife => theLife instanceof Plant) as Plant[];

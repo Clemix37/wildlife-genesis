@@ -13,7 +13,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _Ecosystem_instances, _Ecosystem_interval, _Ecosystem_changeProbabilities, _Ecosystem_checkForActionsAfterSimulation, _Ecosystem_getNextLife, _Ecosystem_actionAfterEating, _Ecosystem_actionAfterKill, _Ecosystem_actionAfterReproduce;
+var _Ecosystem_instances, _Ecosystem_isPaused, _Ecosystem_interval, _Ecosystem_cancelInterval, _Ecosystem_changeProbabilities, _Ecosystem_checkForActionsAfterSimulation, _Ecosystem_getNextLife, _Ecosystem_actionAfterEating, _Ecosystem_actionAfterKill, _Ecosystem_actionAfterReproduce;
 Object.defineProperty(exports, "__esModule", { value: true });
 const Animal_1 = __importDefault(require("./Animal"));
 const Content_1 = __importDefault(require("./Content"));
@@ -24,14 +24,28 @@ class Ecosystem {
     //#region Constructor
     constructor({ population, deads }) {
         _Ecosystem_instances.add(this);
+        _Ecosystem_isPaused.set(this, void 0);
         _Ecosystem_interval.set(this, void 0);
         this.population = population;
         this.deads = deads;
         this.indexLife = -1;
+        __classPrivateFieldSet(this, _Ecosystem_isPaused, true, "f");
         __classPrivateFieldSet(this, _Ecosystem_interval, null, "f");
     }
     //#endregion
     //#region Public methods
+    playOrPause() {
+        console.log(`Before: ${__classPrivateFieldGet(this, _Ecosystem_isPaused, "f")}`);
+        __classPrivateFieldSet(this, _Ecosystem_isPaused, !__classPrivateFieldGet(this, _Ecosystem_isPaused, "f"), "f");
+        console.log(`After: ${__classPrivateFieldGet(this, _Ecosystem_isPaused, "f")}`);
+        // If simulation is paused, we clear the interval
+        if (__classPrivateFieldGet(this, _Ecosystem_isPaused, "f") && !!__classPrivateFieldGet(this, _Ecosystem_interval, "f"))
+            __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_cancelInterval).call(this);
+        // if not, we simulate
+        else if (!__classPrivateFieldGet(this, _Ecosystem_isPaused, "f"))
+            this.simulate();
+        return __classPrivateFieldGet(this, _Ecosystem_isPaused, "f");
+    }
     addLives(...lives) {
         this.population.push(...lives);
     }
@@ -39,6 +53,7 @@ class Ecosystem {
         // Only if simulation has been cleared
         if (!!__classPrivateFieldGet(this, _Ecosystem_interval, "f"))
             return;
+        console.log("simulation");
         this.displayPopulationAndDeads();
         __classPrivateFieldSet(this, _Ecosystem_interval, setInterval(() => {
             const nextLife = __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_getNextLife).call(this);
@@ -46,10 +61,8 @@ class Ecosystem {
             __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_checkForActionsAfterSimulation).call(this, nextLife);
             this.displayPopulationAndDeads();
             __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_changeProbabilities).call(this);
-            if (this.population.length === 0 && !!__classPrivateFieldGet(this, _Ecosystem_interval, "f")) {
-                clearInterval(__classPrivateFieldGet(this, _Ecosystem_interval, "f"));
-                __classPrivateFieldSet(this, _Ecosystem_interval, null, "f");
-            }
+            if (this.population.length === 0 && !!__classPrivateFieldGet(this, _Ecosystem_interval, "f"))
+                __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_cancelInterval).call(this);
         }, Utils_1.default.delayBetweenActions), "f");
     }
     displayPopulationAndDeads() {
@@ -63,7 +76,12 @@ class Ecosystem {
         Content_1.default.displayPopulation(Utils_1.default.getDisplayTemplate(display, false));
     }
 }
-_Ecosystem_interval = new WeakMap(), _Ecosystem_instances = new WeakSet(), _Ecosystem_changeProbabilities = function _Ecosystem_changeProbabilities() {
+_Ecosystem_isPaused = new WeakMap(), _Ecosystem_interval = new WeakMap(), _Ecosystem_instances = new WeakSet(), _Ecosystem_cancelInterval = function _Ecosystem_cancelInterval() {
+    if (!__classPrivateFieldGet(this, _Ecosystem_interval, "f"))
+        return;
+    clearInterval(__classPrivateFieldGet(this, _Ecosystem_interval, "f"));
+    __classPrivateFieldSet(this, _Ecosystem_interval, null, "f");
+}, _Ecosystem_changeProbabilities = function _Ecosystem_changeProbabilities() {
     const plants = this.population.filter(theLife => theLife instanceof Plant_1.default);
     const animals = this.population.filter(theLife => theLife instanceof Animal_1.default);
     // We change the probabilities of animals

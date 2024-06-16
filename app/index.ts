@@ -8,14 +8,16 @@ const LBL_NAME_PLANT: HTMLInputElement = document.getElementById("txtNamePlant")
 const CHECK_EATABLE_PLANT: HTMLInputElement = document.getElementById("checkIsEatable") as HTMLInputElement;
 
 const BTNS: {
+    PLAY_PAUSE: HTMLButtonElement,
     ADD: {
         ANIMAL: HTMLButtonElement,
         PLANT: HTMLButtonElement,
     }
 } = {
+    PLAY_PAUSE: document.getElementById("btn-play-pause") as HTMLButtonElement,
     ADD: {
-        ANIMAL: document.getElementById("btnAddAnimal") as HTMLButtonElement,
-        PLANT: document.getElementById("btnAddPlant") as HTMLButtonElement,
+        ANIMAL: document.getElementById("btn-add-animal") as HTMLButtonElement,
+        PLANT: document.getElementById("btn-add-plant") as HTMLButtonElement,
     },
 };
 const ecosystem: Ecosystem = new Ecosystem({ population: [], deads: [] });
@@ -23,6 +25,11 @@ const ecosystem: Ecosystem = new Ecosystem({ population: [], deads: [] });
 //#region Events
 
 function bindPageEvents(){
+    // Play or pause the simulation
+    BTNS.PLAY_PAUSE.addEventListener("click", () => {
+        const isPaused = ecosystem.playOrPause();
+        BTNS.PLAY_PAUSE.innerText = isPaused ? `Play` : "Pause";
+    });
     // Add the animal
     BTNS.ADD.ANIMAL.addEventListener("click", () => {
         const name = !!LBL_NAME_ANIMAL.value ? LBL_NAME_ANIMAL.value : "Dog";
@@ -64,5 +71,4 @@ const a3 = new Animal({ name: "Racoon", race: "Marron" });
 const a4 = new Animal({ name: "Cat", race: "Ragdoll" });
 ecosystem.addLives(p1, p2, p3, p4, a1, a2, a3, a4);
 
-// Every XX seconds we simulate the ecosystem
-ecosystem.simulate(); // We launch first simulation
+ecosystem.displayPopulationAndDeads();
