@@ -33,7 +33,7 @@ class Utils {
     }
 
     getDisplayTemplate(content: string, isLine: boolean = true, additionnalClasses: string = ""): string {
-        const classes = `${isLine ? "flex width-100" : "flex colonne width-100"} ${additionnalClasses}`;
+        const classes = `flex width-100${isLine ? "" : " colonne"} ${additionnalClasses}`;
         return `
             <div class="${classes}">
                 ${content}

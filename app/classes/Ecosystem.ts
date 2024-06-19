@@ -32,10 +32,13 @@ export default class Ecosystem implements IEcosystem {
 
     //#region Public methods
 
-    playOrPause(){
-        console.log(`Before: ${this.#isPaused}`);
+    /**
+     * Simulate or pause the simulation
+     * Returns the current if it is paused or not
+     * @returns {boolean}
+     */
+    playOrPause(): boolean {
         this.#isPaused = !this.#isPaused;
-        console.log(`After: ${this.#isPaused}`);
         // If simulation is paused, we clear the interval
         if(this.#isPaused && !!this.#interval) this.#cancelInterval();
         // if not, we simulate
@@ -43,15 +46,21 @@ export default class Ecosystem implements IEcosystem {
         return this.#isPaused;
     }
 
+    /**
+     * Add lives given as parameters to the population or to the deads
+     * @param lives lives to add
+     */
     addLives(...lives: Life[]): void {
-        this.population.push(...lives);
+        this.population.push(...lives.filter(theLife => !!theLife.alive));
+        this.deads.push(...lives.filter(theLife => !theLife.alive));
     }
 
+    /**
+     * Sets the interval for the simulation
+     */
     simulate(): void {
         // Only if simulation has been cleared
         if(!!this.#interval) return;
-        console.log("simulation");
-        this.displayPopulationAndDeads();
         this.#interval = setInterval(() => {
             const nextLife: Life = this.#getNextLife();
             nextLife.live(this.population);
@@ -62,21 +71,66 @@ export default class Ecosystem implements IEcosystem {
         }, Utils.delayBetweenActions);
     }
 
+    /**
+     * Display every life dead or alive with the correct template
+     * Attach the kill and respawn events
+     */
     displayPopulationAndDeads(): void {
         let display = "";
         const everyone: Life[] = [...this.population, ...this.deads];
         for (let i = 0; i < everyone.length; i++) {
             const theLife: Life = everyone[i];
             display += Utils.getDisplayTemplate(
-                theLife.alive ? `<span class="good-event"> - ❤️ - </span><span>${theLife.icon} - ${theLife.name}</span>`
-                    : `<span class="bad-event"> - 💀 - </span><span>${theLife.icon} - ${theLife.name}</span>`, true, "justify-content-space-around");
+                theLife.alive ? `<span class="good-event"> - <span data-id="${theLife.id}" class="btn-kill-life">❤️</span> - </span><span>${theLife.icon} - ${theLife.name}</span>`
+                    : `<span class="bad-event"> - <span data-id="${theLife.id}" class="btn-respawn-life">💀</span> - </span><span>${theLife.icon} - ${theLife.name}</span>`, true, "justify-content-space-around");
         }
         Content.displayPopulation(Utils.getDisplayTemplate(display, false));
+        // So that we can kill and respawn plants or animals
+        this.#attachKillAndRespawnEvents();
     }
 
     //#endregion
 
     //#region Private methods
+
+    /**
+     * Attach the kill life buttons and respawn life buttons to the actions
+     */
+    #attachKillAndRespawnEvents(): void {
+        const btnsKills = document.querySelectorAll(".btn-kill-life");
+        const kill = (e: any) => {
+            const { id } = e.target.dataset;
+            if(!id) return;
+            const lifeToKill = this.population.find(theLife => theLife.id === id);
+            if(!lifeToKill) return;
+            lifeToKill.kill();
+            this.#actionAfterKill(lifeToKill);
+            this.displayPopulationAndDeads();
+        };
+        for (let i = 0; i < btnsKills.length; i++) {
+            const btnKill = btnsKills[i];
+            if(!btnKill) continue;
+            btnKill.removeEventListener("click", kill);
+            btnKill.addEventListener("click", kill);
+        }
+        const btnsRespawn = document.querySelectorAll(".btn-respawn-life");
+        const respawn = (e: any) => {
+            const { id } = e.target.dataset;
+            if(!id) return;
+            const oldLife = this.deads.find(theLife => theLife.id === id);
+            if(!oldLife) return;
+            oldLife.resuscitate();
+            this.addLives(oldLife);
+            this.deads = this.deads.filter(theLife => theLife.id !== id);
+            this.displayPopulationAndDeads();
+        };
+        for (let i = 0; i < btnsRespawn.length; i++) {
+            const btnResp = btnsRespawn[i];
+            if(!btnResp) continue;
+            btnResp.removeEventListener("click", respawn);
+            btnResp.addEventListener("click", respawn);
+        }
+    }
 
     /**
      * Cancel the interval
@@ -131,23 +185,39 @@ export default class Ecosystem implements IEcosystem {
         }
     }
 
+    /**
+     * After an action, we must call the right function
+     * @param actualLife 
+     */
     #checkForActionsAfterSimulation(actualLife: Life): void {
         if(Utils.itemHasBeenKilled) this.#actionAfterKill(actualLife);
         else if(Utils.itemHasReproduced) this.#actionAfterReproduce(actualLife);
         else if(Utils.itemHasEaten) this.#actionAfterEating();
     }
 
+    /**
+     * Gets the next life based on the index and the population
+     * @returns {Life}
+     */
     #getNextLife(): Life {
         this.indexLife = this.indexLife >= this.population.length - 1 ? 0 : this.indexLife + 1;
         return this.population[this.indexLife];
     }
 
+    /**
+     * We store the deads and filter the deads from the population
+     */
     #actionAfterEating(): void {
         const idsDeads = [...this.deads.map(dead => dead.id)];
         this.deads = [...this.deads, ...this.population.filter(theLife => !theLife.alive && !idsDeads.includes(theLife.id))];
         this.population = [...this.population.filter(theLife => !!theLife.alive)];
     }
 
+    /**
+     * We add the life killed in the deads
+     * And filter from the population
+     * @param actualLife 
+     */
     #actionAfterKill(actualLife: Life): void {
         Utils.itemHasBeenKilled = false;
         const idsOfDeads = [...this.deads.map(dead => dead.id)];
@@ -157,6 +227,11 @@ export default class Ecosystem implements IEcosystem {
         this.population = this.population.filter(aLife => aLife.id !== actualLife.id);
     }
 
+    /**
+     * Copy data from the actual life as parameter
+     * And add the new life
+     * @param actualLife 
+     */
     #actionAfterReproduce(actualLife: Life): void {
         Utils.itemHasReproduced = false;
         // Create the animal

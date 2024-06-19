@@ -1,6 +1,8 @@
 import ILife from "../interfaces/ILife";
 import { v4 as uuidv4 } from "uuid";
 import IProbability from "../interfaces/IProbability";
+import Utils from "./Utils";
+import Content from "./Content";
 
 export default class Life implements ILife {
     
@@ -42,6 +44,26 @@ export default class Life implements ILife {
         if(!probaSaved) return;
         probaSaved.weight = proba.weight;
         this.#generateActionsBasedOnProba();
+    }
+
+    /**
+     * We tell the item has been killed and is not alive anymore
+     * And display the message
+     */
+    kill(): void {
+        Utils.itemHasBeenKilled = true;
+        this.alive = false;
+        Content.display(Utils.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "justify-content-space-around"));
+    }
+
+    /**
+     * We tell the item has not been killed and is alive
+     * And display the message
+     */
+    resuscitate(): void {
+        Utils.itemHasBeenKilled = false;
+        this.alive = true;
+        Content.display(Utils.getDisplayTemplate(`<span class="good-event"> - Resuscitated - </span><span>${this.name}</span>`, true, "justify-content-space-around"));
     }
 
     //#endregion

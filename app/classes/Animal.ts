@@ -68,16 +68,6 @@ export default class Animal extends Life implements IAnimal {
     }
 
     /**
-     * We tell the item has been killed and is not alive anymore
-     * And display the message
-     */
-    kill(): void {
-        Utils.itemHasBeenKilled = true;
-        this.alive = false;
-        Content.display(Utils.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "justify-content-space-around"));
-    }
-
-    /**
      * Get an animal to reproduce with
      * Display the reproduction if possible
      * @param population ILife[]

@@ -13,7 +13,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _Ecosystem_instances, _Ecosystem_isPaused, _Ecosystem_interval, _Ecosystem_cancelInterval, _Ecosystem_changeProbabilities, _Ecosystem_checkForActionsAfterSimulation, _Ecosystem_getNextLife, _Ecosystem_actionAfterEating, _Ecosystem_actionAfterKill, _Ecosystem_actionAfterReproduce;
+var _Ecosystem_instances, _Ecosystem_isPaused, _Ecosystem_interval, _Ecosystem_attachKillAndRespawnEvents, _Ecosystem_cancelInterval, _Ecosystem_changeProbabilities, _Ecosystem_checkForActionsAfterSimulation, _Ecosystem_getNextLife, _Ecosystem_actionAfterEating, _Ecosystem_actionAfterKill, _Ecosystem_actionAfterReproduce;
 Object.defineProperty(exports, "__esModule", { value: true });
 const Animal_1 = __importDefault(require("./Animal"));
 const Content_1 = __importDefault(require("./Content"));
@@ -34,10 +34,13 @@ class Ecosystem {
     }
     //#endregion
     //#region Public methods
+    /**
+     * Simulate or pause the simulation
+     * Returns the current if it is paused or not
+     * @returns {boolean}
+     */
     playOrPause() {
-        console.log(`Before: ${__classPrivateFieldGet(this, _Ecosystem_isPaused, "f")}`);
         __classPrivateFieldSet(this, _Ecosystem_isPaused, !__classPrivateFieldGet(this, _Ecosystem_isPaused, "f"), "f");
-        console.log(`After: ${__classPrivateFieldGet(this, _Ecosystem_isPaused, "f")}`);
         // If simulation is paused, we clear the interval
         if (__classPrivateFieldGet(this, _Ecosystem_isPaused, "f") && !!__classPrivateFieldGet(this, _Ecosystem_interval, "f"))
             __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_cancelInterval).call(this);
@@ -46,15 +49,21 @@ class Ecosystem {
             this.simulate();
         return __classPrivateFieldGet(this, _Ecosystem_isPaused, "f");
     }
+    /**
+     * Add lives given as parameters to the population or to the deads
+     * @param lives lives to add
+     */
     addLives(...lives) {
-        this.population.push(...lives);
+        this.population.push(...lives.filter(theLife => !!theLife.alive));
+        this.deads.push(...lives.filter(theLife => !theLife.alive));
     }
+    /**
+     * Sets the interval for the simulation
+     */
     simulate() {
         // Only if simulation has been cleared
         if (!!__classPrivateFieldGet(this, _Ecosystem_interval, "f"))
             return;
-        console.log("simulation");
-        this.displayPopulationAndDeads();
         __classPrivateFieldSet(this, _Ecosystem_interval, setInterval(() => {
             const nextLife = __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_getNextLife).call(this);
             nextLife.live(this.population);
@@ -65,18 +74,64 @@ class Ecosystem {
                 __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_cancelInterval).call(this);
         }, Utils_1.default.delayBetweenActions), "f");
     }
+    /**
+     * Display every life dead or alive with the correct template
+     * Attach the kill and respawn events
+     */
     displayPopulationAndDeads() {
         let display = "";
         const everyone = [...this.population, ...this.deads];
         for (let i = 0; i < everyone.length; i++) {
             const theLife = everyone[i];
-            display += Utils_1.default.getDisplayTemplate(theLife.alive ? `<span class="good-event"> - ❤️ - </span><span>${theLife.icon} - ${theLife.name}</span>`
-                : `<span class="bad-event"> - 💀 - </span><span>${theLife.icon} - ${theLife.name}</span>`, true, "justify-content-space-around");
+            display += Utils_1.default.getDisplayTemplate(theLife.alive ? `<span class="good-event"> - <span data-id="${theLife.id}" class="btn-kill-life">❤️</span> - </span><span>${theLife.icon} - ${theLife.name}</span>`
+                : `<span class="bad-event"> - <span data-id="${theLife.id}" class="btn-respawn-life">💀</span> - </span><span>${theLife.icon} - ${theLife.name}</span>`, true, "justify-content-space-around");
         }
         Content_1.default.displayPopulation(Utils_1.default.getDisplayTemplate(display, false));
+        // So that we can kill and respawn plants or animals
+        __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_attachKillAndRespawnEvents).call(this);
     }
 }
-_Ecosystem_isPaused = new WeakMap(), _Ecosystem_interval = new WeakMap(), _Ecosystem_instances = new WeakSet(), _Ecosystem_cancelInterval = function _Ecosystem_cancelInterval() {
+_Ecosystem_isPaused = new WeakMap(), _Ecosystem_interval = new WeakMap(), _Ecosystem_instances = new WeakSet(), _Ecosystem_attachKillAndRespawnEvents = function _Ecosystem_attachKillAndRespawnEvents() {
+    const btnsKills = document.querySelectorAll(".btn-kill-life");
+    const kill = (e) => {
+        const { id } = e.target.dataset;
+        if (!id)
+            return;
+        const lifeToKill = this.population.find(theLife => theLife.id === id);
+        if (!lifeToKill)
+            return;
+        lifeToKill.kill();
+        __classPrivateFieldGet(this, _Ecosystem_instances, "m", _Ecosystem_actionAfterKill).call(this, lifeToKill);
+        this.displayPopulationAndDeads();
+    };
+    for (let i = 0; i < btnsKills.length; i++) {
+        const btnKill = btnsKills[i];
+        if (!btnKill)
+            continue;
+        btnKill.removeEventListener("click", kill);
+        btnKill.addEventListener("click", kill);
+    }
+    const btnsRespawn = document.querySelectorAll(".btn-respawn-life");
+    const respawn = (e) => {
+        const { id } = e.target.dataset;
+        if (!id)
+            return;
+        const oldLife = this.deads.find(theLife => theLife.id === id);
+        if (!oldLife)
+            return;
+        oldLife.resuscitate();
+        this.addLives(oldLife);
+        this.deads = this.deads.filter(theLife => theLife.id !== id);
+        this.displayPopulationAndDeads();
+    };
+    for (let i = 0; i < btnsRespawn.length; i++) {
+        const btnResp = btnsRespawn[i];
+        if (!btnResp)
+            continue;
+        btnResp.removeEventListener("click", respawn);
+        btnResp.addEventListener("click", respawn);
+    }
+}, _Ecosystem_cancelInterval = function _Ecosystem_cancelInterval() {
     if (!__classPrivateFieldGet(this, _Ecosystem_interval, "f"))
         return;
     clearInterval(__classPrivateFieldGet(this, _Ecosystem_interval, "f"));

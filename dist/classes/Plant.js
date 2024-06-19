@@ -45,11 +45,6 @@ class Plant extends Life_1.default {
         if (fctName === "reproduce")
             this.reproduce();
     }
-    kill() {
-        this.alive = false;
-        Utils_1.default.itemHasBeenKilled = true;
-        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "justify-content-space-around"));
-    }
     grow() {
         Content_1.default.display(__classPrivateFieldGet(this, _Plant_instances, "m", _Plant_getDisplayTemplate).call(this));
     }

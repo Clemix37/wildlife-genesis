@@ -44,12 +44,6 @@ export default class Plant extends Life implements IPlant {
         if(fctName === "reproduce") this.reproduce();
     }
 
-    kill(): void {
-        this.alive = false;
-        Utils.itemHasBeenKilled = true;
-        Content.display(Utils.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "justify-content-space-around"));
-    }
-
     grow(): void {
         Content.display(this.#getDisplayTemplate());
     }

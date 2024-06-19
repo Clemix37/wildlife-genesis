@@ -71,15 +71,6 @@ class Animal extends Life_1.default {
         Content_1.default.display(__classPrivateFieldGet(this, _Animal_instances, "m", _Animal_getTmplEating).call(this, lifeToEat));
     }
     /**
-     * We tell the item has been killed and is not alive anymore
-     * And display the message
-     */
-    kill() {
-        Utils_1.default.itemHasBeenKilled = true;
-        this.alive = false;
-        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "justify-content-space-around"));
-    }
-    /**
      * Get an animal to reproduce with
      * Display the reproduction if possible
      * @param population ILife[]

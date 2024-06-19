@@ -4,9 +4,14 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 var _Life_instances, _Life_generateActionsBasedOnProba;
 Object.defineProperty(exports, "__esModule", { value: true });
 const uuid_1 = require("uuid");
+const Utils_1 = __importDefault(require("./Utils"));
+const Content_1 = __importDefault(require("./Content"));
 class Life {
     //#endregion
     //#region Constructor
@@ -32,6 +37,24 @@ class Life {
             return;
         probaSaved.weight = proba.weight;
         __classPrivateFieldGet(this, _Life_instances, "m", _Life_generateActionsBasedOnProba).call(this);
+    }
+    /**
+     * We tell the item has been killed and is not alive anymore
+     * And display the message
+     */
+    kill() {
+        Utils_1.default.itemHasBeenKilled = true;
+        this.alive = false;
+        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Killed - </span><span>${this.name}</span>`, true, "justify-content-space-around"));
+    }
+    /**
+     * We tell the item has not been killed and is alive
+     * And display the message
+     */
+    resuscitate() {
+        Utils_1.default.itemHasBeenKilled = false;
+        this.alive = true;
+        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="good-event"> - Resuscitated - </span><span>${this.name}</span>`, true, "justify-content-space-around"));
     }
 }
 _Life_instances = new WeakSet(), _Life_generateActionsBasedOnProba = function _Life_generateActionsBasedOnProba() {
