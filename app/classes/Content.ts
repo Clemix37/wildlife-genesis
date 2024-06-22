@@ -1,46 +1,45 @@
-
 class Content {
-    
-    //#region properties
+	//#region properties
 
-    #id: string;
-    #idPopulation: string;
-    #element: HTMLElement;
-    #populationElement: HTMLElement;
+	#id: string;
+	#idPopulation: string;
+	#element: HTMLElement;
+	#populationElement: HTMLElement;
 
-    //#endregion
+	//#endregion
 
-    //#region Constructor
-    
-    constructor(){
-        this.#id = "content";
-        this.#idPopulation = "population";
-        this.#element = document.getElementById(this.#id) as HTMLElement;
-        this.#populationElement = document.getElementById(this.#idPopulation) as HTMLElement;
-    }
+	//#region Constructor
 
-    //#endregion
+	constructor() {
+		this.#id = "content";
+		this.#idPopulation = "population";
+		this.#element = document.getElementById(this.#id) as HTMLElement;
+		this.#populationElement = document.getElementById(
+			this.#idPopulation,
+		) as HTMLElement;
+	}
 
-    //#region Public methods
+	//#endregion
 
-    /**
-     * We display the content given in first so that recent elements appears in first
-     * @param newDomContent 
-     */
-    display(newDomContent: string): void {
-        this.#element.innerHTML = newDomContent + this.#element.innerHTML;
-    }
+	//#region Public methods
 
-    /**
-     * Display the content given in the population element
-     * @param completeDomContent 
-     */
-    displayPopulation(completeDomContent: string): void {
-        this.#populationElement.innerHTML = completeDomContent;
-    }
+	/**
+	 * We display the content given in first so that recent elements appears in first
+	 * @param newDomContent
+	 */
+	display(newDomContent: string): void {
+		this.#element.innerHTML = newDomContent + this.#element.innerHTML;
+	}
 
-    //#endregion
+	/**
+	 * Display the content given in the population element
+	 * @param completeDomContent
+	 */
+	displayPopulation(completeDomContent: string): void {
+		this.#populationElement.innerHTML = completeDomContent;
+	}
 
+	//#endregion
 }
 
 export default new Content();

@@ -8,11 +8,17 @@ class Utils {
         this.itemHasToBeDelete = false;
         this.itemHasBeenKilled = false;
         this.itemHasEaten = false;
-        this.delayBetweenActions = 2000;
-        this.daysWithoutFoodBeforeDeath = 5;
+        this.delayBetweenActions = 1000;
+        this.daysWithoutFoodBeforeDeath = 30;
+        this.numberOfTimesEatenBeforeDeath = 5;
     }
     //#endregion
     //#region Public methods
+    /**
+     * Gets a random index for the array given in parameters
+     * @param tab
+     * @returns random index
+     */
     getRandomIndex(tab) {
         return Math.floor(Math.random() * tab.length);
     }

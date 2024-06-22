@@ -15,7 +15,7 @@ const Content_1 = __importDefault(require("./Content"));
 class Life {
     //#endregion
     //#region Constructor
-    constructor({ name, actionsProba, icon }) {
+    constructor({ name, actionsProba, icon, }) {
         _Life_instances.add(this);
         this.id = (0, uuid_1.v4)();
         this.name = name;
@@ -23,6 +23,7 @@ class Life {
         this.actions = __classPrivateFieldGet(this, _Life_instances, "m", _Life_generateActionsBasedOnProba).call(this);
         this.alive = true;
         this.icon = icon;
+        this.days = 0;
     }
     //#endregion
     //#region Public methods
@@ -32,7 +33,7 @@ class Life {
         this.actions = __classPrivateFieldGet(this, _Life_instances, "m", _Life_generateActionsBasedOnProba).call(this);
     }
     changeUniqueProba(proba) {
-        const probaSaved = this.actionsProba.find(prob => prob.value === proba.value);
+        const probaSaved = this.actionsProba.find((prob) => prob.value === proba.value);
         if (!probaSaved)
             return;
         probaSaved.weight = proba.weight;
@@ -56,6 +57,13 @@ class Life {
         this.alive = true;
         Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="good-event"> - Resuscitated - </span><span>${this.name}</span>`, true, "justify-content-space-around"));
     }
+    /**
+     * Add the number of days given in parameters
+     * @param nbDays
+     */
+    addDays(nbDays) {
+        this.days += nbDays;
+    }
 }
 _Life_instances = new WeakSet(), _Life_generateActionsBasedOnProba = function _Life_generateActionsBasedOnProba() {
     const actions = [];
@@ -66,6 +74,7 @@ _Life_instances = new WeakSet(), _Life_generateActionsBasedOnProba = function _L
             actions.push(actionProba.value);
         }
     }
+    // We shuffle the array created
     return actions.sort((a, b) => 0.5 - Math.random());
 };
 exports.default = Life;

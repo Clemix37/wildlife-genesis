@@ -19,19 +19,20 @@ class Plant extends Life_1.default {
         const actionsProba = [
             {
                 value: "grow",
-                weight: 10,
+                weight: Plant.DEFAULTS_PROBA_WEIGHT.grow,
             },
             {
                 value: "reproduce",
-                weight: 3,
+                weight: Plant.DEFAULTS_PROBA_WEIGHT.reproduce,
             },
             {
                 value: "kill",
-                weight: 1,
-            }
+                weight: Plant.DEFAULTS_PROBA_WEIGHT.kill,
+            },
         ];
         super({ name, actionsProba, icon: "🪴" });
         _Plant_instances.add(this);
+        this.numberOfTimesEaten = 0;
         this.eatable = eatable;
     }
     //#endregion
@@ -44,6 +45,7 @@ class Plant extends Life_1.default {
             this.kill();
         if (fctName === "reproduce")
             this.reproduce();
+        this.addDays(1);
     }
     grow() {
         Content_1.default.display(__classPrivateFieldGet(this, _Plant_instances, "m", _Plant_getDisplayTemplate).call(this));
@@ -55,6 +57,9 @@ class Plant extends Life_1.default {
             <span>${this.name}</span>
         `, true, "justify-content-space-around"));
     }
+    addEaten(nbTimes) {
+        this.numberOfTimesEaten += nbTimes;
+    }
 }
 _Plant_instances = new WeakSet(), _Plant_getDisplayTemplate = function _Plant_getDisplayTemplate() {
     return Utils_1.default.getDisplayTemplate(`
@@ -63,5 +68,10 @@ _Plant_instances = new WeakSet(), _Plant_getDisplayTemplate = function _Plant_ge
         `, true, "justify-content-space-around");
 }, _Plant_getRandomAction = function _Plant_getRandomAction() {
     return this.actions[Utils_1.default.getRandomIndex(this.actions)];
+};
+Plant.DEFAULTS_PROBA_WEIGHT = {
+    grow: 10,
+    reproduce: 3,
+    kill: 0.5,
 };
 exports.default = Plant;

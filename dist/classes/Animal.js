@@ -20,18 +20,18 @@ class Animal extends Life_1.default {
         const actionsProba = [
             {
                 value: "eat",
-                weight: 3,
+                weight: Animal.DEFAULTS_PROBA_WEIGHT.eat,
             },
             {
                 value: "reproduce",
-                weight: 2,
+                weight: Animal.DEFAULTS_PROBA_WEIGHT.reproduce,
             },
             {
                 value: "kill",
-                weight: 1,
+                weight: Animal.DEFAULTS_PROBA_WEIGHT.kill,
             },
         ];
-        super({ name, actionsProba, icon: "🐶" });
+        super({ name, actionsProba, icon: "🦄" });
         _Animal_instances.add(this);
         this.race = race;
         this.daysWithoutFood = 0;
@@ -50,23 +50,27 @@ class Animal extends Life_1.default {
             this.kill();
         else if (fctName === "reproduce")
             this.reproduce(population);
+        this.addDays(1);
     }
     eat(population) {
         // We get the plant to eat
-        const plants = population.filter(theLife => theLife instanceof Plant_1.default && theLife.eatable);
+        const plants = population.filter((theLife) => theLife instanceof Plant_1.default && theLife.eatable);
         const lifeToEat = plants.length > 0 ? plants[Utils_1.default.getRandomIndex(plants)] : null;
-        // We change the nb of days without eating 
+        // We change the nb of days without eating
         if (!lifeToEat)
             this.daysWithoutFood++;
-        else
+        else {
             this.daysWithoutFood = 0;
+            lifeToEat.addEaten(1);
+            if (lifeToEat.numberOfTimesEaten >
+                Utils_1.default.numberOfTimesEatenBeforeDeath)
+                lifeToEat.alive = false;
+        }
         // If it's been too long since eating, we let it die
         if (this.daysWithoutFood >= Utils_1.default.daysWithoutFoodBeforeDeath)
             return this.kill();
         // We specify that the actual item has eaten and if it's still alive
         Utils_1.default.itemHasEaten = true;
-        if (!!lifeToEat)
-            lifeToEat.alive = false;
         // We display the action on screen
         Content_1.default.display(__classPrivateFieldGet(this, _Animal_instances, "m", _Animal_getTmplEating).call(this, lifeToEat));
     }
@@ -77,24 +81,34 @@ class Animal extends Life_1.default {
      * @returns void
      */
     reproduce(population) {
-        const animals = population.filter(theLife => theLife instanceof Animal && theLife.id !== this.id);
+        const animals = population.filter((theLife) => theLife instanceof Animal && theLife.id !== this.id);
         const animalToReproduceWith = animals.length > 0 ? animals[Utils_1.default.getRandomIndex(animals)] : null;
+        Content_1.default.display(Utils_1.default.getDisplayTemplate(`
+					<span class="${!animalToReproduceWith ? "bad" : "good"}-event"> - ${!animalToReproduceWith ? "Error " : ""}Reproducing - </span>
+					<span>${!animalToReproduceWith ? `No reproduction without other animal (${this.name})` : this.name}</span>
+				`, true, "justify-content-space-around"));
         if (!animalToReproduceWith)
-            return Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="bad-event"> - Error - </span><span>No reproduction without other animal (${this.name})</span>`, true, "justify-content-space-around"));
+            return;
         Utils_1.default.itemHasReproduced = true;
-        Content_1.default.display(Utils_1.default.getDisplayTemplate(`<span class="good-event"> - Reproducing - </span><span>${this.name}</span>`, true, "justify-content-space-around"));
     }
 }
 _Animal_instances = new WeakSet(), _Animal_getTmplEating = function _Animal_getTmplEating(lifeToEat) {
-    const display = !!lifeToEat ? `
+    const display = !!lifeToEat ?
+        `
             <span class="good-event"> - Eating - </span>
             <span>${this.name} => ${lifeToEat.name}</span>
-        ` : `
+        `
+        : `
             <span class="bad-event"> - Error - </span>
             <span>No plant to eat</span>
         `;
     return Utils_1.default.getDisplayTemplate(display, true, "justify-content-space-around");
 }, _Animal_getRandomAction = function _Animal_getRandomAction() {
     return this.actions[Utils_1.default.getRandomIndex(this.actions)];
+};
+Animal.DEFAULTS_PROBA_WEIGHT = {
+    eat: 3,
+    reproduce: 2,
+    kill: 0.01,
 };
 exports.default = Animal;

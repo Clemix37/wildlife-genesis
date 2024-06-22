@@ -13,6 +13,7 @@
       "rootDir": "app",
       "resolveJsonModule": true,
       "esModuleInterop": true,
+      "types": ["node", "jest"]
     },
     "include": ["app/**/*"],
     "exclude": ["node_modules"]

@@ -1,52 +1,61 @@
 import Content from "./Content";
 
 class Utils {
+	//#region Properties
 
-    //#region Properties
+	itemHasToBeDelete: boolean;
+	itemHasReproduced: boolean;
+	itemHasBeenKilled: boolean;
+	itemHasEaten: boolean;
+	delayBetweenActions: number;
+	daysWithoutFoodBeforeDeath: number;
+	numberOfTimesEatenBeforeDeath: number;
 
-    itemHasToBeDelete: boolean;
-    itemHasReproduced: boolean;
-    itemHasBeenKilled: boolean;
-    itemHasEaten: boolean;
-    delayBetweenActions: number;
-    daysWithoutFoodBeforeDeath: number;
+	//#endregion
 
-    //#endregion
+	//#region Constructor
 
-    //#region Constructor
+	constructor() {
+		this.itemHasReproduced = false;
+		this.itemHasToBeDelete = false;
+		this.itemHasBeenKilled = false;
+		this.itemHasEaten = false;
+		this.delayBetweenActions = 1000;
+		this.daysWithoutFoodBeforeDeath = 30;
+		this.numberOfTimesEatenBeforeDeath = 5;
+	}
 
-    constructor(){
-        this.itemHasReproduced = false;
-        this.itemHasToBeDelete = false;
-        this.itemHasBeenKilled = false;
-        this.itemHasEaten = false;
-        this.delayBetweenActions = 2000;
-        this.daysWithoutFoodBeforeDeath = 5;
-    }
+	//#endregion
 
-    //#endregion
+	//#region Public methods
 
-    //#region Public methods
+	/**
+	 * Gets a random index for the array given in parameters
+	 * @param tab
+	 * @returns random index
+	 */
+	getRandomIndex(tab: any[]): number {
+		return Math.floor(Math.random() * tab.length);
+	}
 
-    getRandomIndex(tab: any[]): number {
-        return Math.floor(Math.random() * tab.length);
-    }
-
-    getDisplayTemplate(content: string, isLine: boolean = true, additionnalClasses: string = ""): string {
-        const classes = `flex width-100${isLine ? "" : " colonne"} ${additionnalClasses}`;
-        return `
+	getDisplayTemplate(
+		content: string,
+		isLine: boolean = true,
+		additionnalClasses: string = "",
+	): string {
+		const classes = `flex width-100${isLine ? "" : " colonne"} ${additionnalClasses}`;
+		return `
             <div class="${classes}">
                 ${content}
             </div>
         `;
-    }
+	}
 
-    //#endregion
+	//#endregion
 
-    //#region Private methods
+	//#region Private methods
 
-    //#endregion
-
+	//#endregion
 }
 
 export default new Utils();
