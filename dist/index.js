@@ -20,11 +20,18 @@ const BTNS = {
 const ecosystem = new Ecosystem_1.default({ population: [], deads: [] });
 //#region Events
 function bindPageEvents() {
-    // Play or pause the simulation
-    BTNS.PLAY_PAUSE.addEventListener("click", () => {
+    const changePlayStatus = () => {
         const isPaused = ecosystem.playOrPause();
-        BTNS.PLAY_PAUSE.innerText = isPaused ? `Play` : "Pause";
+        BTNS.PLAY_PAUSE.innerText = `${isPaused ? "Play" : "Pause"} (spacebar)`;
+    };
+    // If space is pressed, then we play or pause
+    document.addEventListener("keyup", (e) => {
+        if (e.code !== "Space")
+            return;
+        changePlayStatus();
     });
+    // Play or pause the simulation
+    BTNS.PLAY_PAUSE.addEventListener("click", changePlayStatus);
     // Add the animal
     BTNS.ADD.ANIMAL.addEventListener("click", () => {
         const name = !!LBL_NAME_ANIMAL.value ? LBL_NAME_ANIMAL.value : "Dog";
@@ -40,7 +47,6 @@ function bindPageEvents() {
     BTNS.ADD.PLANT.addEventListener("click", () => {
         const name = !!LBL_NAME_PLANT.value ? LBL_NAME_PLANT.value : "Flower";
         const eatable = CHECK_EATABLE_PLANT.checked;
-        console.log(LBL_NAME_PLANT.value, name, eatable);
         const newPlant = new Plant_1.default({ name, eatable });
         ecosystem.addLives(newPlant);
         LBL_NAME_PLANT.value = "";

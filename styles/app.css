@@ -109,3 +109,10 @@ fieldset {
 .align-self-auto { align-self: auto; }
 .align-self-baseline { align-self: baseline; }
 .align-self-center { align-self: center; }
+
+
+#btn-play-pause {
+    width: 200px;
+    height: 50px;
+    font-size: 1.5em;
+}
