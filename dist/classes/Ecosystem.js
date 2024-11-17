@@ -22,6 +22,13 @@ const Utils_1 = __importDefault(require("./Utils"));
 class Ecosystem {
     //#endregion
     //#region Constructor
+    /**
+     * Constructor of the class Ecosystem
+     * @constructor
+     * @param obj
+     * @param obj.population
+     * @param obj.deads
+     */
     constructor({ population, deads }) {
         _Ecosystem_instances.add(this);
         _Ecosystem_isPaused.set(this, void 0);

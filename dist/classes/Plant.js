@@ -15,6 +15,13 @@ const Utils_1 = __importDefault(require("./Utils"));
 class Plant extends Life_1.default {
     //#endregion
     //#region Constructor
+    /**
+     * Constructor of the class Plant
+     * @constructor
+     * @param obj
+     * @param obj.name
+     * @param obj.eatable
+     */
     constructor({ name, eatable = true }) {
         const actionsProba = [
             {
@@ -37,6 +44,11 @@ class Plant extends Life_1.default {
     }
     //#endregion
     //#region Public methods
+    /**
+     * Choose randomly the action to do for the plant
+     * Add a day of life
+     * @param population
+     */
     live(population) {
         const fctName = __classPrivateFieldGet(this, _Plant_instances, "m", _Plant_getRandomAction).call(this);
         if (fctName === "grow")
@@ -47,9 +59,15 @@ class Plant extends Life_1.default {
             this.reproduce();
         this.addDays(1);
     }
+    /**
+     * Displays that the plant grows
+     */
     grow() {
         Content_1.default.display(__classPrivateFieldGet(this, _Plant_instances, "m", _Plant_getDisplayTemplate).call(this));
     }
+    /**
+     * Display the reproduction
+     */
     reproduce() {
         Utils_1.default.itemHasReproduced = true;
         Content_1.default.display(Utils_1.default.getDisplayTemplate(`
@@ -57,6 +75,10 @@ class Plant extends Life_1.default {
             <span>${this.name}</span>
         `, true, "justify-content-space-around"));
     }
+    /**
+     * Add number of times eaten
+     * @param nbTimes
+     */
     addEaten(nbTimes) {
         this.numberOfTimesEaten += nbTimes;
     }

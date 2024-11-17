@@ -11,15 +11,22 @@ export default class Animal extends Life implements IAnimal {
 	race: string;
 	daysWithoutFood: number;
 	static DEFAULTS_PROBA_WEIGHT = {
-		eat: 3,
-		reproduce: 2,
-		kill: 0.01,
+		eat: 3, // ~ (3 * 100) / 501 = 59.88%
+		reproduce: 2, // ~ (2 * 100) / 501 = 39.92%
+		kill: 0.01, // ~ (0.01 * 100) / 501 = 0.2%
 	};
 
 	//#endregion
 
 	//#region Constructor
 
+	/**
+	 * Constructor of the class Animal
+	 * @constructor
+	 * @param obj
+	 * @param obj.name
+	 * @param obj.race
+	 */
 	constructor({ name, race }: { name: string; race: string }) {
 		const actionsProba: IProbability[] = [
 			{
@@ -56,6 +63,13 @@ export default class Animal extends Life implements IAnimal {
 		this.addDays(1);
 	}
 
+	/**
+	 * Find a life to eat
+	 * Changes the number of days without food so that probabilities rise
+	 * Displays the action
+	 * @param population
+	 * @returns {void}
+	 */
 	eat(population: Life[]): void {
 		// We get the plant to eat
 		const plants: Plant[] = population.filter(
@@ -113,6 +127,11 @@ export default class Animal extends Life implements IAnimal {
 
 	//#region Private methods
 
+	/**
+	 * Returns the template of the animal for displaying it
+	 * @param lifeToEat
+	 * @returns {string}
+	 */
 	#getTmplEating(lifeToEat: Plant | null): string {
 		const display =
 			!!lifeToEat ?
@@ -131,6 +150,10 @@ export default class Animal extends Life implements IAnimal {
 		);
 	}
 
+	/**
+	 * Returns a random action
+	 * @returns {string}
+	 */
 	#getRandomAction(): string {
 		return this.actions[Utils.getRandomIndex(this.actions)];
 	}

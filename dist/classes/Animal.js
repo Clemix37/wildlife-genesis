@@ -16,6 +16,13 @@ const Utils_1 = __importDefault(require("./Utils"));
 class Animal extends Life_1.default {
     //#endregion
     //#region Constructor
+    /**
+     * Constructor of the class Animal
+     * @constructor
+     * @param obj
+     * @param obj.name
+     * @param obj.race
+     */
     constructor({ name, race }) {
         const actionsProba = [
             {
@@ -52,6 +59,13 @@ class Animal extends Life_1.default {
             this.reproduce(population);
         this.addDays(1);
     }
+    /**
+     * Find a life to eat
+     * Changes the number of days without food so that probabilities rise
+     * Displays the action
+     * @param population
+     * @returns {void}
+     */
     eat(population) {
         // We get the plant to eat
         const plants = population.filter((theLife) => theLife instanceof Plant_1.default && theLife.eatable);

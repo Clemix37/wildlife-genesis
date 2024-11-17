@@ -17,6 +17,13 @@ const Utils_1 = __importDefault(require("./Utils"));
 class Animal extends Life_1.default {
     //#endregion
     //#region Constructor
+    /**
+     * Constructor of the class Animal
+     * @constructor
+     * @param obj
+     * @param obj.name
+     * @param obj.race
+     */
     constructor({ name, race }) {
         const actionsProba = [
             {
@@ -53,6 +60,13 @@ class Animal extends Life_1.default {
             this.reproduce(population);
         this.addDays(1);
     }
+    /**
+     * Find a life to eat
+     * Changes the number of days without food so that probabilities rise
+     * Displays the action
+     * @param population
+     * @returns {void}
+     */
     eat(population) {
         // We get the plant to eat
         const plants = population.filter((theLife) => theLife instanceof Plant_1.default && theLife.eatable);
@@ -132,6 +146,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 class Content {
     //#endregion
     //#region Constructor
+    /**
+     * Constructor of the class Content
+     * @constructor
+     */
     constructor() {
         //#region properties
         _Content_id.set(this, void 0);
@@ -188,6 +206,13 @@ const Utils_1 = __importDefault(require("./Utils"));
 class Ecosystem {
     //#endregion
     //#region Constructor
+    /**
+     * Constructor of the class Ecosystem
+     * @constructor
+     * @param obj
+     * @param obj.population
+     * @param obj.deads
+     */
     constructor({ population, deads }) {
         _Ecosystem_instances.add(this);
         _Ecosystem_isPaused.set(this, void 0);
@@ -458,6 +483,14 @@ const Content_1 = __importDefault(require("./Content"));
 class Life {
     //#endregion
     //#region Constructor
+    /**
+     * Constructor of the Life class
+     * @constructor
+     * @param obj
+     * @param obj.name
+     * @param obj.actionsProba
+     * @param obj.icon
+     */
     constructor({ name, actionsProba, icon, }) {
         _Life_instances.add(this);
         this.id = (0, uuid_1.v4)();
@@ -470,11 +503,21 @@ class Life {
     }
     //#endregion
     //#region Public methods
+    /** Function overrided */
     live(thing) { }
+    /**
+     * Changes probabilities based on actions and items
+     * @param probas
+     */
     changeProbabilities(probas) {
         this.actionsProba = probas;
         this.actions = __classPrivateFieldGet(this, _Life_instances, "m", _Life_generateActionsBasedOnProba).call(this);
     }
+    /**
+     * Change a unique probability based on weight and value
+     * @param proba
+     * @returns {void}
+     */
     changeUniqueProba(proba) {
         const probaSaved = this.actionsProba.find((prob) => prob.value === proba.value);
         if (!probaSaved)
@@ -540,6 +583,13 @@ const Utils_1 = __importDefault(require("./Utils"));
 class Plant extends Life_1.default {
     //#endregion
     //#region Constructor
+    /**
+     * Constructor of the class Plant
+     * @constructor
+     * @param obj
+     * @param obj.name
+     * @param obj.eatable
+     */
     constructor({ name, eatable = true }) {
         const actionsProba = [
             {
@@ -562,6 +612,11 @@ class Plant extends Life_1.default {
     }
     //#endregion
     //#region Public methods
+    /**
+     * Choose randomly the action to do for the plant
+     * Add a day of life
+     * @param population
+     */
     live(population) {
         const fctName = __classPrivateFieldGet(this, _Plant_instances, "m", _Plant_getRandomAction).call(this);
         if (fctName === "grow")
@@ -572,9 +627,15 @@ class Plant extends Life_1.default {
             this.reproduce();
         this.addDays(1);
     }
+    /**
+     * Displays that the plant grows
+     */
     grow() {
         Content_1.default.display(__classPrivateFieldGet(this, _Plant_instances, "m", _Plant_getDisplayTemplate).call(this));
     }
+    /**
+     * Display the reproduction
+     */
     reproduce() {
         Utils_1.default.itemHasReproduced = true;
         Content_1.default.display(Utils_1.default.getDisplayTemplate(`
@@ -582,6 +643,10 @@ class Plant extends Life_1.default {
             <span>${this.name}</span>
         `, true, "justify-content-space-around"));
     }
+    /**
+     * Add number of times eaten
+     * @param nbTimes
+     */
     addEaten(nbTimes) {
         this.numberOfTimesEaten += nbTimes;
     }
@@ -626,6 +691,13 @@ class Utils {
     getRandomIndex(tab) {
         return Math.floor(Math.random() * tab.length);
     }
+    /**
+     * Returns a template with values from the config in parameters
+     * @param content
+     * @param isLine
+     * @param additionnalClasses
+     * @returns {string}
+     */
     getDisplayTemplate(content, isLine = true, additionnalClasses = "") {
         const classes = `flex width-100${isLine ? "" : " colonne"} ${additionnalClasses}`;
         return `

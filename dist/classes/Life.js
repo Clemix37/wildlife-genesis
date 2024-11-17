@@ -15,6 +15,14 @@ const Content_1 = __importDefault(require("./Content"));
 class Life {
     //#endregion
     //#region Constructor
+    /**
+     * Constructor of the Life class
+     * @constructor
+     * @param obj
+     * @param obj.name
+     * @param obj.actionsProba
+     * @param obj.icon
+     */
     constructor({ name, actionsProba, icon, }) {
         _Life_instances.add(this);
         this.id = (0, uuid_1.v4)();
@@ -27,11 +35,21 @@ class Life {
     }
     //#endregion
     //#region Public methods
+    /** Function overrided */
     live(thing) { }
+    /**
+     * Changes probabilities based on actions and items
+     * @param probas
+     */
     changeProbabilities(probas) {
         this.actionsProba = probas;
         this.actions = __classPrivateFieldGet(this, _Life_instances, "m", _Life_generateActionsBasedOnProba).call(this);
     }
+    /**
+     * Change a unique probability based on weight and value
+     * @param proba
+     * @returns {void}
+     */
     changeUniqueProba(proba) {
         const probaSaved = this.actionsProba.find((prob) => prob.value === proba.value);
         if (!probaSaved)

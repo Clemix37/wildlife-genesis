@@ -1,6 +1,6 @@
 export default interface IPlant {
-	numberOfTimesEaten: number;
-	addEaten(nbTimes: number): void;
-	grow(): void;
-	reproduce(): void;
+	numberOfTimesEaten: number; // Number of times plant has been eaten
+	addEaten(nbTimes: number): void; // Add a number of times being eaten
+	grow(): void; // Grow the plant
+	reproduce(): void; // Reproduce the plant
 }

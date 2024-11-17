@@ -15,6 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 class Content {
     //#endregion
     //#region Constructor
+    /**
+     * Constructor of the class Content
+     * @constructor
+     */
     constructor() {
         //#region properties
         _Content_id.set(this, void 0);

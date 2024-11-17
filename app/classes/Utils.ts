@@ -38,6 +38,13 @@ class Utils {
 		return Math.floor(Math.random() * tab.length);
 	}
 
+	/**
+	 * Returns a template with values from the config in parameters
+	 * @param content
+	 * @param isLine
+	 * @param additionnalClasses
+	 * @returns {string}
+	 */
 	getDisplayTemplate(
 		content: string,
 		isLine: boolean = true,

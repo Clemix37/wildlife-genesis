@@ -10,6 +10,10 @@ class Content {
 
 	//#region Constructor
 
+	/**
+	 * Constructor of the class Content
+	 * @constructor
+	 */
 	constructor() {
 		this.#id = "content";
 		this.#idPopulation = "population";

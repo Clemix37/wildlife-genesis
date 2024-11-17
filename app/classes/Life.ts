@@ -19,6 +19,14 @@ export default class Life implements ILife {
 
 	//#region Constructor
 
+	/**
+	 * Constructor of the Life class
+	 * @constructor
+	 * @param obj
+	 * @param obj.name
+	 * @param obj.actionsProba
+	 * @param obj.icon
+	 */
 	constructor({
 		name,
 		actionsProba,
@@ -41,13 +49,23 @@ export default class Life implements ILife {
 
 	//#region Public methods
 
+	/** Function overrided */
 	live(thing: any): void {}
 
+	/**
+	 * Changes probabilities based on actions and items
+	 * @param probas
+	 */
 	changeProbabilities(probas: IProbability[]): void {
 		this.actionsProba = probas;
 		this.actions = this.#generateActionsBasedOnProba();
 	}
 
+	/**
+	 * Change a unique probability based on weight and value
+	 * @param proba
+	 * @returns {void}
+	 */
 	changeUniqueProba(proba: IProbability): void {
 		const probaSaved: IProbability | undefined = this.actionsProba.find(
 			(prob) => prob.value === proba.value,
@@ -101,6 +119,11 @@ export default class Life implements ILife {
 
 	//#region Private methods
 
+	/**
+	 * Generate actions based on probabilities of the life instance
+	 * So that we can use this actions array randomly
+	 * @returns {string[]}
+	 */
 	#generateActionsBasedOnProba(): string[] {
 		const actions: string[] = [];
 		for (let i = 0; i < this.actionsProba.length; i++) {

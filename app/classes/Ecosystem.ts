@@ -19,6 +19,13 @@ export default class Ecosystem implements IEcosystem {
 
 	//#region Constructor
 
+	/**
+	 * Constructor of the class Ecosystem
+	 * @constructor
+	 * @param obj
+	 * @param obj.population
+	 * @param obj.deads
+	 */
 	constructor({ population, deads }: { population: Life[]; deads: Life[] }) {
 		this.population = population;
 		this.deads = deads;
